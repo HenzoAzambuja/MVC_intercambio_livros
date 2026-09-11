@@ -1,0 +1,15 @@
+br\com\intercambiolivros\filter\AuthFilter.class
+br\com\intercambiolivros\controller\LoginServlet.class
+br\com\intercambiolivros\controller\BaseServlet.class
+br\com\intercambiolivros\controller\LogoutServlet.class
+br\com\intercambiolivros\controller\UsuarioServlet.class
+br\com\intercambiolivros\service\PerfilService.class
+br\com\intercambiolivros\dao\MysqlDAO.class
+br\com\intercambiolivros\controller\HomeServlet.class
+br\com\intercambiolivros\dao\UsuarioDAO.class
+br\com\intercambiolivros\model\Perfil.class
+br\com\intercambiolivros\service\UsuarioService.class
+br\com\intercambiolivros\controller\PerfilServlet.class
+br\com\intercambiolivros\dao\PerfilDAO.class
+br\com\intercambiolivros\model\Usuario.class
+br\com\intercambiolivros\config\MysqlSingleton.class
