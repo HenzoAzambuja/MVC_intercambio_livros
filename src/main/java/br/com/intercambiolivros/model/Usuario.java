@@ -1,3 +1,5 @@
+package br.com.intercambiolivros.model;
+
 public class Usuario {
 
     private Long id;
