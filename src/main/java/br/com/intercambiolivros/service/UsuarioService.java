@@ -7,10 +7,9 @@ import br.com.intercambiolivros.dao.UsuarioDAO;
 import br.com.intercambiolivros.model.Usuario;
 
 /**
- * SERVICE de Usuario — regras de negocio ficam aqui.
+ * Service de Usuario.
  *
- * Controller so chama estes metodos e decide a view.
- * DAO so executa SQL.
+ * Responsavel pelas regras de negocio.
  */
 public class UsuarioService {
 
@@ -25,131 +24,254 @@ public class UsuarioService {
     }
 
     /**
-     * Regra de autenticacao:
-     * - login e senha obrigatorios
-     * - so libera acesso se existir usuario com esse login/senha
+     * Realiza a autenticacao do usuario.
      */
     public Usuario autenticar(String login, String senha) {
+
         login = this.normalizar(login);
         senha = this.normalizar(senha);
 
         if (login == null || senha == null) {
-            throw new IllegalArgumentException("Informe login e senha.");
+            throw new IllegalArgumentException(
+                    "Informe login e senha.");
         }
 
-        Usuario usuario = this.usuarioDAO.buscarPorLoginESenha(login, senha);
+        Usuario usuario =
+                this.usuarioDAO.buscarPorLoginESenha(login, senha);
+
         if (usuario == null) {
-            throw new IllegalArgumentException("Login ou senha invalidos.");
+            throw new IllegalArgumentException(
+                    "Login ou senha invalidos.");
         }
+
         return usuario;
     }
 
+    /**
+     * Lista todos os usuarios.
+     */
     public List<Usuario> listar() {
         return this.usuarioDAO.listarTodos();
     }
 
+    /**
+     * Busca usuario pelo ID.
+     */
     public Usuario buscarPorId(Long id) {
+
         if (id == null) {
             return null;
         }
+
         return this.usuarioDAO.buscarPorId(id);
     }
 
     /**
-     * Regra de salvamento:
-     * - sem id  -> cadastro novo
-     * - com id  -> alteracao (usuario precisa existir)
+     * Salva um usuario.
+     *
+     * Sem ID = cadastro.
+     * Com ID = alteracao.
      */
     public void salvar(Usuario usuario) {
+
         if (usuario == null) {
-            throw new IllegalArgumentException("Usuario e obrigatorio.");
+            throw new IllegalArgumentException(
+                    "Usuario e obrigatorio.");
         }
 
         this.prepararDados(usuario);
+
         this.validarCamposObrigatorios(usuario);
+        this.validarEmail(usuario.getEmail());
         this.validarSenha(usuario.getSenha());
         this.validarPerfilExistente(usuario.getPerfilId());
         this.validarLoginUnico(usuario);
+        this.validarEmailUnico(usuario);
 
         if (usuario.getId() == null) {
+
             this.usuarioDAO.inserir(usuario);
             return;
         }
 
         if (this.usuarioDAO.buscarPorId(usuario.getId()) == null) {
-            throw new IllegalArgumentException("Usuario nao encontrado para alteracao.");
+
+            throw new IllegalArgumentException(
+                    "Usuario nao encontrado para alteracao.");
         }
+
         this.usuarioDAO.alterar(usuario);
     }
 
     /**
-     * Regra de exclusao:
-     * - id obrigatorio
-     * - usuario precisa existir
+     * Exclui um usuario.
      */
     public void deletar(Long id) {
+
         if (id == null) {
-            throw new IllegalArgumentException("Id e obrigatorio para excluir.");
+            throw new IllegalArgumentException(
+                    "Id e obrigatorio para excluir.");
         }
+
         if (this.usuarioDAO.buscarPorId(id) == null) {
-            throw new IllegalArgumentException("Usuario nao encontrado.");
+            throw new IllegalArgumentException(
+                    "Usuario nao encontrado.");
         }
+
         this.usuarioDAO.deletar(id);
     }
 
+    /**
+     * Remove espacos desnecessarios dos dados.
+     */
     private void prepararDados(Usuario usuario) {
-        usuario.setNome(this.normalizar(usuario.getNome()));
-        usuario.setLogin(this.normalizar(usuario.getLogin()));
-        usuario.setSenha(this.normalizar(usuario.getSenha()));
+
+        usuario.setNome(
+                this.normalizar(usuario.getNome()));
+
+        usuario.setEmail(
+                this.normalizar(usuario.getEmail()));
+
+        usuario.setLogin(
+                this.normalizar(usuario.getLogin()));
+
+        usuario.setSenha(
+                this.normalizar(usuario.getSenha()));
     }
 
+    /**
+     * Valida os campos obrigatorios.
+     */
     private void validarCamposObrigatorios(Usuario usuario) {
+
         if (usuario.getNome() == null) {
-            throw new IllegalArgumentException("Nome e obrigatorio.");
+            throw new IllegalArgumentException(
+                    "Nome e obrigatorio.");
         }
+
+        if (usuario.getEmail() == null) {
+            throw new IllegalArgumentException(
+                    "Email e obrigatorio.");
+        }
+
         if (usuario.getLogin() == null) {
-            throw new IllegalArgumentException("Login e obrigatorio.");
+            throw new IllegalArgumentException(
+                    "Login e obrigatorio.");
         }
+
         if (usuario.getSenha() == null) {
-            throw new IllegalArgumentException("Senha e obrigatoria.");
+            throw new IllegalArgumentException(
+                    "Senha e obrigatoria.");
         }
+
         if (usuario.getPerfilId() == null) {
-            throw new IllegalArgumentException("Perfil e obrigatorio.");
+            throw new IllegalArgumentException(
+                    "Perfil e obrigatorio.");
         }
     }
 
+    /**
+     * Valida o tamanho minimo da senha.
+     */
     private void validarSenha(String senha) {
+
         if (senha.length() < SENHA_MINIMA) {
-            throw new IllegalArgumentException("Senha deve ter no minimo " + SENHA_MINIMA + " caracteres.");
+
+            throw new IllegalArgumentException(
+                    "Senha deve ter no minimo "
+                            + SENHA_MINIMA
+                            + " caracteres.");
         }
     }
 
+    /**
+     * Valida formato basico do email.
+     */
+    private void validarEmail(String email) {
+
+        if (!email.matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+
+            throw new IllegalArgumentException(
+                    "Informe um email valido.");
+        }
+    }
+
+    /**
+     * Verifica se o perfil existe.
+     */
     private void validarPerfilExistente(Long perfilId) {
+
         if (this.perfilDAO.buscarPorId(perfilId) == null) {
-            throw new IllegalArgumentException("Perfil informado nao existe.");
+
+            throw new IllegalArgumentException(
+                    "Perfil informado nao existe.");
         }
     }
 
+    /**
+     * Verifica se o login ja esta sendo utilizado.
+     */
     private void validarLoginUnico(Usuario usuario) {
-        Usuario existente = this.usuarioDAO.buscarPorLogin(usuario.getLogin());
+
+        Usuario existente =
+                this.usuarioDAO.buscarPorLogin(
+                        usuario.getLogin());
+
         if (existente == null) {
             return;
         }
-        // no cadastro, qualquer login repetido e invalido
+
         if (usuario.getId() == null) {
-            throw new IllegalArgumentException("Ja existe um usuario com este login.");
+
+            throw new IllegalArgumentException(
+                    "Ja existe um usuario com este login.");
         }
-        // na alteracao, so permite se o login for do proprio usuario
+
         if (!existente.getId().equals(usuario.getId())) {
-            throw new IllegalArgumentException("Ja existe um usuario com este login.");
+
+            throw new IllegalArgumentException(
+                    "Ja existe um usuario com este login.");
         }
     }
 
+    /**
+     * Verifica se o email ja esta sendo utilizado.
+     */
+    private void validarEmailUnico(Usuario usuario) {
+
+        Usuario existente =
+                this.usuarioDAO.buscarPorEmail(
+                        usuario.getEmail());
+
+        if (existente == null) {
+            return;
+        }
+
+        if (usuario.getId() == null) {
+
+            throw new IllegalArgumentException(
+                    "Ja existe um usuario com este email.");
+        }
+
+        if (!existente.getId().equals(usuario.getId())) {
+
+            throw new IllegalArgumentException(
+                    "Ja existe um usuario com este email.");
+        }
+    }
+
+    /**
+     * Normaliza uma String.
+     */
     private String normalizar(String valor) {
+
         if (valor == null) {
             return null;
         }
+
         String limpo = valor.trim();
+
         return limpo.isEmpty() ? null : limpo;
     }
 }
