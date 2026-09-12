@@ -109,6 +109,29 @@ public class UsuarioDAO extends MysqlDAO {
         return null;
     }
 
+    public Usuario buscarPorEmail(String email) {
+
+    String sql =
+            "SELECT u.id, u.nome, u.email, u.login, u.senha, "
+                    + "u.perfil_id, p.nome AS perfil_nome "
+                    + "FROM usuarios u "
+                    + "INNER JOIN perfis p ON p.id = u.perfil_id "
+                    + "WHERE u.email = ?";
+
+    try (ResultSet rs = super.executar(sql, email)) {
+
+        if (rs.next()) {
+            return this.mapearComPerfil(rs);
+        }
+
+    } catch (SQLException e) {
+        throw new RuntimeException(
+                "Erro ao buscar por email.", e);
+    }
+
+    return null;
+}
+
     public int contarPorPerfil(Long perfilId) {
 
         String sql =
