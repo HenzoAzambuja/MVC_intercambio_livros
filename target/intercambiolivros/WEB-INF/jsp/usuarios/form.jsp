@@ -1,28 +1,221 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Cadastro - BookSwap</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>
+        <c:choose>
+            <c:when test="${empty usuario.id}">
+                Novo usuario
+            </c:when>
+            <c:otherwise>
+                Editar usuario
+            </c:otherwise>
+        </c:choose>
+        - Intercambio de Livros
+    </title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/estilo.css">
+
 </head>
 
 <body>
-    <main class="auth">
-        <div class="auth-card">
-            <div class="brand">Book<span>Swap</span></div>
-            <h1>Criar conta</h1>
-            <form action="#" method="post">
-                <div class="field"><label>Nome</label><input class="input" name="nome" required></div>
-                <div class="field"><label>E-mail</label><input class="input" type="email" name="email" required></div>
-                <div class="field"><label>Senha</label><input class="input" type="password" name="senha" required></div>
-                <button class="btn btn-primary" style="width:100%">Cadastrar</button>
-            </form>
-            <div class="small">Já possui conta? <a href="../login.jsp" style="color:#365d4a;font-weight:700">Entrar</a>
+
+<header class="topbar">
+
+    <div class="container">
+
+        <strong>Intercambio de Livros</strong>
+
+        <nav>
+
+            <a href="${pageContext.request.contextPath}/home">
+                Home
+            </a>
+
+            <a href="${pageContext.request.contextPath}/usuarios">
+                Usuarios
+            </a>
+
+            <a href="${pageContext.request.contextPath}/perfis">
+                Perfis
+            </a>
+
+            <a href="${pageContext.request.contextPath}/logout">
+                Sair
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+    <div class="page-header">
+
+        <h1>
+
+            <c:choose>
+
+                <c:when test="${empty usuario.id}">
+                    Novo usuario
+                </c:when>
+
+                <c:otherwise>
+                    Editar usuario
+                </c:otherwise>
+
+            </c:choose>
+
+        </h1>
+
+    </div>
+
+    <div class="card">
+
+        <c:if test="${not empty erro}">
+
+            <div class="alert alert-erro">
+                ${erro}
             </div>
-        </div>
-    </main>
+
+        </c:if>
+
+        <form method="post"
+              action="${pageContext.request.contextPath}/usuarios">
+
+            <input type="hidden"
+                   name="acao"
+                   value="salvar">
+
+            <input type="hidden"
+                   name="id"
+                   value="${usuario.id}">
+
+
+            <div class="form-group">
+
+                <label for="nome">
+                    Nome
+                </label>
+
+                <input type="text"
+                       id="nome"
+                       name="nome"
+                       value="${usuario.nome}"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input type="email"
+                       id="email"
+                       name="email"
+                       value="${usuario.email}"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="login">
+                    Login
+                </label>
+
+                <input type="text"
+                       id="login"
+                       name="login"
+                       value="${usuario.login}"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="senha">
+                    Senha
+                </label>
+
+                <input type="password"
+                       id="senha"
+                       name="senha"
+                       value="${usuario.senha}"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="perfilId">
+                    Perfil
+                </label>
+
+                <select id="perfilId"
+                        name="perfilId"
+                        required>
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <c:forEach var="perfil" items="${perfis}">
+
+                        <option value="${perfil.id}"
+                            <c:if test="${usuario.perfilId == perfil.id}">
+                                selected
+                            </c:if>>
+
+                            ${perfil.nome}
+
+                        </option>
+
+                    </c:forEach>
+
+                </select>
+
+            </div>
+
+
+            <div class="actions">
+
+                <button type="submit" class="btn">
+                    Salvar
+                </button>
+
+                <a class="btn btn-secondary"
+                   href="${pageContext.request.contextPath}/usuarios">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
 </body>
 
 </html>

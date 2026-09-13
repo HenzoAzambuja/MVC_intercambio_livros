@@ -1,52 +1,159 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Livro - BookSwap</title>
-    <link rel="stylesheet" href="../../../css/estilo.css">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>
+        <c:choose>
+            <c:when test="${empty livro.id}">
+                Novo livro
+            </c:when>
+            <c:otherwise>
+                Editar livro
+            </c:otherwise>
+        </c:choose>
+        - Intercambio de Livros
+    </title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/estilo.css">
+
 </head>
 
 <body>
-    <header class="topbar">
-        <div class="container nav"><a class="brand" href="../home.jsp">Book<span>Swap</span></a>
-            <nav class="menu"><a href="../home.jsp">Início</a><a href="lista.jsp">Livros</a><a
-                    href="../trocas/lista.jsp">Minhas Trocas</a><a href="../usuarios/lista.jsp">Perfil</a></nav>
-        </div>
-    </header>
-    <main class="page">
-        <div class="container">
-            <div class="page-title">
-                <h1>Cadastrar livro</h1>
-                <div class="muted">Preencha os dados do livro para disponibilizá-lo para troca.</div>
+
+<header class="topbar">
+
+    <div class="container">
+
+        <strong>Intercambio de Livros</strong>
+
+        <nav>
+
+            <a href="${pageContext.request.contextPath}/home">
+                Home
+            </a>
+
+            <a href="${pageContext.request.contextPath}/livros">
+                Livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/livros?acao=meus">
+                Meus livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/logout">
+                Sair
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+    <div class="page-header">
+
+        <h1>
+
+            <c:choose>
+
+                <c:when test="${empty livro.id}">
+                    Novo livro
+                </c:when>
+
+                <c:otherwise>
+                    Editar livro
+                </c:otherwise>
+
+            </c:choose>
+
+        </h1>
+
+    </div>
+
+    <div class="card">
+
+        <c:if test="${not empty erro}">
+
+            <div class="alert alert-erro">
+                ${erro}
             </div>
-            <div class="panel">
-                <form action="#" method="post">
-                    <div class="grid-2">
-                        <div class="field"><label>Título</label><input class="input" name="titulo" required></div>
-                        <div class="field"><label>Autor</label><input class="input" name="autor" required></div>
-                        <div class="field"><label>Categoria</label><select class="select" name="categoria">
-                                <option>Fantasia</option>
-                                <option>Romance</option>
-                                <option>Tecnologia</option>
-                                <option>Aventura</option>
-                                <option>Outro</option>
-                            </select></div>
-                        <div class="field"><label>Estado</label><select class="select" name="estado">
-                                <option>Ótimo</option>
-                                <option>Bom</option>
-                                <option>Regular</option>
-                            </select></div>
-                    </div>
-                    <div class="field"><label>Descrição</label><textarea class="textarea" name="descricao" rows="5"
-                            placeholder="Fale um pouco sobre o livro..."></textarea></div>
-                    <div class="actions"><button class="btn btn-primary" type="submit">Salvar livro</button><a
-                            class="btn btn-outline" href="lista.jsp">Cancelar</a></div>
-                </form>
+
+        </c:if>
+
+        <form method="post"
+              action="${pageContext.request.contextPath}/livros">
+
+            <input type="hidden"
+                   name="id"
+                   value="${livro.id}">
+
+
+            <div class="form-group">
+
+                <label for="titulo">
+                    Titulo
+                </label>
+
+                <input type="text"
+                       id="titulo"
+                       name="titulo"
+                       value="${livro.titulo}"
+                       required>
+
             </div>
-        </div>
-    </main>
+
+
+            <div class="form-group">
+
+                <label for="autor">
+                    Autor
+                </label>
+
+                <input type="text"
+                       id="autor"
+                       name="autor"
+                       value="${livro.autor}"
+                       required>
+
+            </div>
+
+
+            <div class="actions">
+
+                <button type="submit"
+                        class="btn">
+
+                    Salvar
+
+                </button>
+
+                <a class="btn btn-secondary"
+                   href="${pageContext.request.contextPath}/livros?acao=meus">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
 </body>
 
 </html>

@@ -8,9 +8,12 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
 
-    <title>Usuarios - Intercambio de Livros</title>
+    <title>
+        Meus livros - Intercambio de Livros
+    </title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/estilo.css">
@@ -31,12 +34,12 @@
                 Home
             </a>
 
-            <a href="${pageContext.request.contextPath}/usuarios">
-                Usuarios
+            <a href="${pageContext.request.contextPath}/livros">
+                Livros disponiveis
             </a>
 
-            <a href="${pageContext.request.contextPath}/perfis">
-                Perfis
+            <a href="${pageContext.request.contextPath}/livros?acao=meus">
+                Meus livros
             </a>
 
             <a href="${pageContext.request.contextPath}/logout">
@@ -53,12 +56,14 @@
 
     <div class="page-header">
 
-        <h1>Usuarios</h1>
+        <h1>
+            Meus livros
+        </h1>
 
         <a class="btn"
-           href="${pageContext.request.contextPath}/usuarios?acao=novo">
+           href="${pageContext.request.contextPath}/livros?acao=novo">
 
-            Novo usuario
+            + Adicionar livro
 
         </a>
 
@@ -74,19 +79,31 @@
     </c:if>
 
 
-    <div class="table-wrap">
+    <c:choose>
 
-        <c:choose>
+        <c:when test="${empty livros}">
 
-            <c:when test="${empty usuarios}">
+            <div class="card">
 
                 <p class="empty">
-                    Nenhum usuario cadastrado.
+                    Voce ainda nao cadastrou nenhum livro.
                 </p>
 
-            </c:when>
+                <a class="btn"
+                   href="${pageContext.request.contextPath}/livros?acao=novo">
 
-            <c:otherwise>
+                    Adicionar primeiro livro
+
+                </a>
+
+            </div>
+
+        </c:when>
+
+
+        <c:otherwise>
+
+            <div class="table-wrap">
 
                 <table>
 
@@ -95,10 +112,8 @@
                     <tr>
 
                         <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Login</th>
-                        <th>Perfil</th>
+                        <th>Titulo</th>
+                        <th>Autor</th>
                         <th>Acoes</th>
 
                     </tr>
@@ -107,38 +122,30 @@
 
                     <tbody>
 
-                    <c:forEach var="usuario" items="${usuarios}">
+                    <c:forEach var="livro" items="${livros}">
 
                         <tr>
 
                             <td>
-                                ${usuario.id}
+                                ${livro.id}
                             </td>
 
                             <td>
-                                ${usuario.nome}
+                                ${livro.titulo}
                             </td>
 
                             <td>
-                                ${usuario.email}
-                            </td>
-
-                            <td>
-                                ${usuario.login}
-                            </td>
-
-                            <td>
-                                ${usuario.perfil.nome}
+                                ${livro.autor}
                             </td>
 
                             <td class="links">
 
-                                <a href="${pageContext.request.contextPath}/usuarios?acao=editar&id=${usuario.id}">
+                                <a href="${pageContext.request.contextPath}/livros?acao=editar&id=${livro.id}">
                                     Editar
                                 </a>
 
-                                <a href="${pageContext.request.contextPath}/usuarios?acao=excluir&id=${usuario.id}"
-                                   onclick="return confirm('Excluir este usuario?');">
+                                <a href="${pageContext.request.contextPath}/livros?acao=excluir&id=${livro.id}"
+                                   onclick="return confirm('Excluir este livro?');">
 
                                     Excluir
 
@@ -154,11 +161,11 @@
 
                 </table>
 
-            </c:otherwise>
+            </div>
 
-        </c:choose>
+        </c:otherwise>
 
-    </div>
+    </c:choose>
 
 </main>
 

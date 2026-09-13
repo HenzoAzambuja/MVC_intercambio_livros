@@ -14,7 +14,7 @@ CREATE TABLE perfis (
     nome VARCHAR(100) NOT NULL,
 
     PRIMARY KEY (id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================
@@ -40,7 +40,7 @@ CREATE TABLE usuarios (
     CONSTRAINT fk_usuario_perfil
         FOREIGN KEY (perfil_id)
         REFERENCES perfis(id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================
@@ -58,7 +58,7 @@ CREATE TABLE livros (
     CONSTRAINT fk_livro_usuario
         FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================
@@ -79,7 +79,7 @@ CREATE TABLE trocas (
     CONSTRAINT fk_troca_livro_recebido
         FOREIGN KEY (livro_recebido_id)
         REFERENCES livros(id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================

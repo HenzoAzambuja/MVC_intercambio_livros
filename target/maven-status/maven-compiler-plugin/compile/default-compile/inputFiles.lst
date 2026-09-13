@@ -1,7 +1,9 @@
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\model\Usuario.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\UsuarioServlet.java
+C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\LivroServlet.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\dao\UsuarioDAO.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\PerfilServlet.java
+C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\dao\LivroDAO.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\model\Perfil.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\BaseServlet.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\LogoutServlet.java
@@ -11,5 +13,7 @@ C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\ja
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\dao\PerfilDAO.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\service\UsuarioService.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\controller\LoginServlet.java
+C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\model\Livro.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\dao\MysqlDAO.java
+C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\service\LivroService.java
 C:\Users\henzo\Documents\Aplicação Para Internet\intercambiolivros\src\main\java\br\com\intercambiolivros\config\MysqlSingleton.java
