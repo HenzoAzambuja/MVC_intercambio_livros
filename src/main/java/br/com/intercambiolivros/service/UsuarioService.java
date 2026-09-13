@@ -6,6 +6,7 @@ import br.com.intercambiolivros.dao.PerfilDAO;
 import br.com.intercambiolivros.dao.UsuarioDAO;
 import br.com.intercambiolivros.model.Usuario;
 
+
 /**
  * Service de Usuario.
  *
@@ -14,6 +15,7 @@ import br.com.intercambiolivros.model.Usuario;
 public class UsuarioService {
 
     private static final int SENHA_MINIMA = 6;
+    private static final long PERFIL_NORMAL_ID = 2L;
 
     private final UsuarioDAO usuarioDAO;
     private final PerfilDAO perfilDAO;
@@ -101,6 +103,17 @@ public class UsuarioService {
         }
 
         this.usuarioDAO.alterar(usuario);
+    }
+
+    /**
+     * Cadastra um novo usuario com o perfil normal.
+     * O id do usuario fica nulo para o banco gerar o proximo valor.
+     */
+    public void cadastrarNormal(Usuario usuario) {
+        usuario.setId(null);
+        usuario.setPerfilId(PERFIL_NORMAL_ID);
+
+        this.salvar(usuario);
     }
 
     /**

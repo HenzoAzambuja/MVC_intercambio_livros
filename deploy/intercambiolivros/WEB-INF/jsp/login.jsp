@@ -72,6 +72,15 @@
                     Entrar
                 </button>
 
+                <!-- <button type="submit" class="btn">
+                    Entrar
+                </button> -->
+
+                <a class="btn btn-secondary"
+                    href="${pageContext.request.contextPath}/cadastro">
+                    Criar conta
+                </a>
+
             </div>
 
         </form>

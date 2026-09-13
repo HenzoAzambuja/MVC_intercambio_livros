@@ -1,6 +1,7 @@
 br\com\intercambiolivros\dao\LivroDAO.class
 br\com\intercambiolivros\filter\AuthFilter.class
 br\com\intercambiolivros\controller\LoginServlet.class
+br\com\intercambiolivros\controller\PessoasServlet.class
 br\com\intercambiolivros\controller\BaseServlet.class
 br\com\intercambiolivros\model\Livro.class
 br\com\intercambiolivros\controller\LogoutServlet.class
@@ -17,3 +18,4 @@ br\com\intercambiolivros\controller\LivroServlet.class
 br\com\intercambiolivros\dao\PerfilDAO.class
 br\com\intercambiolivros\model\Usuario.class
 br\com\intercambiolivros\config\MysqlSingleton.class
+br\com\intercambiolivros\controller\CadastroServlet.class

@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import br.com.intercambiolivros.model.Usuario;
 
-@WebFilter(urlPatterns = {"/home", "/livros", "/livros/*", "/trocas", "/trocas/*", "/usuarios", "/usuarios/*"})
+@WebFilter(urlPatterns = {"/home", "/livros", "/livros/*", "/trocas", "/trocas/*", "/usuarios", "/usuarios/*", "/pessoas", "/pessoas/*"})
 public class AuthFilter implements Filter {
 
     @Override
