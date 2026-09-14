@@ -91,7 +91,7 @@ CREATE TABLE trocas (
 INSERT INTO perfis (nome)
 VALUES
     ('Administrador'),
-    ('Usuário');
+    ('Cliente');
 
 
 -- =========================================
@@ -114,12 +114,27 @@ VALUES
         1
     ),
     (
-        'Usuário Teste',
-        'usuario@intercambiolivros.com',
-        'usuario',
+        'Daniel Vorcaro',
+        'dani@intercambiolivros.com',
+        'dani',
         '123456',
         2
+    ),
+    (
+        'Alexandre de Morais',
+        'alexandre@intercambiolivros.com',
+        'alexandre',
+        '123456',
+        3
+    ),
+    (
+        'Dilma Rousseff',
+        'dilma@intercambiolivros.com',
+        'dilma',
+        '123456',
+        4
     );
+    
 
 
 -- =========================================
@@ -138,9 +153,24 @@ VALUES
         2
     ),
     (
-        'O Pequeno Príncipe',
-        'Antoine de Saint-Exupéry',
+        'Harry Potter e a Pedra Filosofal',
+        'J.K. Rowling',
         2
+    ),
+    (
+        'A Luta pelo Direito',
+        'Rudolf von Jhering',
+        3
+    ),
+    (
+        '1984',
+        'George Orwell',
+        3
+    ),
+    (
+        'Madame Bovary',
+        'Gustave Flaubert',
+        4
     );
 
 

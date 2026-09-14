@@ -61,7 +61,7 @@ public class HomeServlet extends BaseServlet {
                         usuarioLogado.getId());
 
         req.setAttribute(
-                "livrosDisponiveiveis",
+                "livrosDisponiveis",
                 this.limitarLivros(
                         livrosDisponiveis,
                         4));
