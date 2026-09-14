@@ -37,6 +37,16 @@ public class LivroService {
         return this.livroDAO.listarPorUsuario(usuarioId);
     }
 
+    public List<Livro> listarDisponiveisPorUsuario(Long usuarioId) {
+
+        if (usuarioId == null) {
+            throw new IllegalArgumentException(
+                    "Usuario nao identificado.");
+        }
+
+        return this.livroDAO.listarDisponiveisPorUsuario(usuarioId);
+    }
+
     public Livro buscarPorId(Long id) {
 
         if (id == null) {
@@ -83,6 +93,7 @@ public class LivroService {
         }
 
         livro.setUsuarioId(usuarioId);
+
         this.livroDAO.alterar(livro);
     }
 
@@ -98,7 +109,8 @@ public class LivroService {
                     "Usuario nao identificado.");
         }
 
-        Livro livro = this.livroDAO.buscarPorId(id);
+        Livro livro =
+                this.livroDAO.buscarPorId(id);
 
         if (livro == null) {
             throw new IllegalArgumentException(
@@ -108,6 +120,12 @@ public class LivroService {
         if (!livro.getUsuarioId().equals(usuarioId)) {
             throw new IllegalArgumentException(
                     "Voce nao pode excluir este livro.");
+        }
+
+        if (this.livroDAO.existeTrocaParaLivro(id)) {
+            throw new IllegalArgumentException(
+                    "Nao e possivel excluir um livro que "
+                            + "ja participou de uma troca.");
         }
 
         this.livroDAO.deletar(id);

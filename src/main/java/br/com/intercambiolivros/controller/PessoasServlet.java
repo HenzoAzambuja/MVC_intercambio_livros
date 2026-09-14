@@ -21,8 +21,7 @@ public class PessoasServlet extends BaseServlet {
     private final LivroService livroService = new LivroService();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = this.usuarioLogado(req);
         Long id = this.paramLong(req, "id");
@@ -36,7 +35,7 @@ public class PessoasServlet extends BaseServlet {
             }
 
             req.setAttribute("usuarioPerfil", usuario);
-            req.setAttribute("livrosPessoa", this.livroService.listarPorUsuario(id));
+            req.setAttribute("livrosPessoa",this.livroService.listarDisponiveisPorUsuario(id));
         } else {
             List<Usuario> usuarios = this.usuarioService.listar().stream()
                     .filter(usuario -> !usuario.getId().equals(usuarioLogado.getId()))
@@ -49,7 +48,19 @@ public class PessoasServlet extends BaseServlet {
     }
 
     private Usuario usuarioLogado(HttpServletRequest req) {
-        HttpSession session = req.getSession(false);
-        return (Usuario) session.getAttribute("usuarioLogado");
+
+    HttpSession session = req.getSession(false);
+
+    if (session == null) {
+        return null;
     }
+
+    Object usuario = session.getAttribute("usuarioLogado");
+
+    if (usuario instanceof Usuario) {
+        return (Usuario) usuario;
+    }
+
+    return null;
+}
 }

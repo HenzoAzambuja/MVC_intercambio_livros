@@ -42,6 +42,10 @@
                             Meus livros
                         </a>
 
+                        <a href="${pageContext.request.contextPath}/trocas">
+                            Trocas
+                        </a>
+
                         <a href="${pageContext.request.contextPath}/pessoas">
                             Pessoas
                         </a>
@@ -208,6 +212,82 @@
 
                 </section>
 
+                <!-- TROCAS -->
+
+                <section class="home-section">
+
+                    <div class="section-header">
+
+                        <h2>
+                            Trocas
+                        </h2>
+
+                        <a href="${pageContext.request.contextPath}/trocas">
+                            Ver todas →
+                        </a>
+
+                    </div>
+
+                    <c:choose>
+
+                        <c:when test="${empty trocas}">
+
+                            <div class="card">
+
+                                <p class="empty">
+                                    Voce ainda nao possui trocas.
+                                </p>
+
+                                <a class="btn"
+                                href="${pageContext.request.contextPath}/trocas?acao=nova">
+
+                                    Fazer uma troca
+
+                                </a>
+
+                            </div>
+
+                        </c:when>
+
+                        <c:otherwise>
+
+                            <div class="grid-cards">
+
+                                <c:forEach
+                                        var="troca"
+                                        items="${trocas}">
+
+                                    <div class="menu-card">
+
+                                        <h3>
+                                            Troca #${troca.id}
+                                        </h3>
+
+                                        <p>
+
+                                            ${troca.livroOferecido.titulo}
+
+                                            ↔
+
+                                            ${troca.livroRecebido.titulo}
+
+                                        </p>
+
+                                        <span>
+                                            Status: ${troca.status}
+                                        </span>
+
+                                    </div>
+
+                                </c:forEach>
+
+                            </div>
+
+                        </c:otherwise>
+
+                    </c:choose>
+
+                </section>
 
                 <!-- PESSOAS -->
 

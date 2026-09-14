@@ -18,9 +18,17 @@ public class LivroDAO extends MysqlDAO {
 
         String sql =
                 "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
-                        + "u.nome AS usuario_nome, u.email AS usuario_email "
+                        + "u.nome AS usuario_nome, "
+                        + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
+                        + "WHERE NOT EXISTS ("
+                        + "SELECT 1 FROM trocas t "
+                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "AND ("
+                        + "t.livro_oferecido_id = l.id "
+                        + "OR t.livro_recebido_id = l.id"
+                        + ")) "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -43,10 +51,18 @@ public class LivroDAO extends MysqlDAO {
 
         String sql =
                 "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
-                        + "u.nome AS usuario_nome, u.email AS usuario_email "
+                        + "u.nome AS usuario_nome, "
+                        + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id <> ? "
+                        + "AND NOT EXISTS ("
+                        + "SELECT 1 FROM trocas t "
+                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "AND ("
+                        + "t.livro_oferecido_id = l.id "
+                        + "OR t.livro_recebido_id = l.id"
+                        + ")) "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -69,10 +85,18 @@ public class LivroDAO extends MysqlDAO {
 
         String sql =
                 "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
-                        + "u.nome AS usuario_nome, u.email AS usuario_email "
+                        + "u.nome AS usuario_nome, "
+                        + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id = ? "
+                        + "AND NOT EXISTS ("
+                        + "SELECT 1 FROM trocas t "
+                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "AND ("
+                        + "t.livro_oferecido_id = l.id "
+                        + "OR t.livro_recebido_id = l.id"
+                        + ")) "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -91,11 +115,46 @@ public class LivroDAO extends MysqlDAO {
         return lista;
     }
 
+    public List<Livro> listarDisponiveisPorUsuario(Long usuarioId) {
+
+        String sql =
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                        + "u.nome AS usuario_nome, "
+                        + "u.email AS usuario_email "
+                        + "FROM livros l "
+                        + "INNER JOIN usuarios u ON u.id = l.usuario_id "
+                        + "WHERE l.usuario_id = ? "
+                        + "AND NOT EXISTS ("
+                        + "SELECT 1 FROM trocas t "
+                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "AND ("
+                        + "t.livro_oferecido_id = l.id "
+                        + "OR t.livro_recebido_id = l.id"
+                        + ")) "
+                        + "ORDER BY l.titulo";
+
+        List<Livro> lista = new ArrayList<>();
+
+        try (ResultSet rs = super.executar(sql, usuarioId)) {
+
+            while (rs.next()) {
+                lista.add(this.mapear(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Erro ao listar livros disponiveis do usuario.", e);
+        }
+
+        return lista;
+    }
+
     public Livro buscarPorId(Long id) {
 
         String sql =
                 "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
-                        + "u.nome AS usuario_nome, u.email AS usuario_email "
+                        + "u.nome AS usuario_nome, "
+                        + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.id = ?";
@@ -154,6 +213,29 @@ public class LivroDAO extends MysqlDAO {
             throw new RuntimeException(
                     "Erro ao alterar livro.", e);
         }
+    }
+
+    public boolean existeTrocaParaLivro(Long livroId) {
+
+        String sql =
+                "SELECT COUNT(*) AS total "
+                        + "FROM trocas "
+                        + "WHERE livro_oferecido_id = ? "
+                        + "OR livro_recebido_id = ?";
+
+        try (ResultSet rs =
+                     super.executar(sql, livroId, livroId)) {
+
+            if (rs.next()) {
+                return rs.getInt("total") > 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Erro ao verificar trocas do livro.", e);
+        }
+
+        return false;
     }
 
     public void deletar(Long id) {

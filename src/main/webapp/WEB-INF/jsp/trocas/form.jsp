@@ -1,40 +1,191 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Solicitar troca - BookSwap</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>
+        Nova troca - Intercambio de Livros
+    </title>
+
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/estilo.css">
+
 </head>
 
 <body>
-    <header class="topbar">
-        <div class="container nav"><a class="brand" href="../home.jsp">Book<span>Swap</span></a>
-            <nav class="menu"><a href="../home.jsp">Início</a><a href="../livros/lista.jsp">Livros</a><a
-                    href="lista.jsp">Minhas Trocas</a><a href="../usuarios/lista.jsp">Perfil</a></nav>
-        </div>
-    </header>
-    <main class="page">
-        <div class="container">
-            <div class="page-title">
-                <h1>Solicitar troca</h1>
-                <div class="muted">Escolha um livro seu para oferecer em troca.</div>
+
+<header class="topbar">
+
+    <div class="container">
+
+        <strong>
+            Intercambio de Livros
+        </strong>
+
+        <nav>
+
+            <a href="${pageContext.request.contextPath}/home">
+                Home
+            </a>
+
+            <a href="${pageContext.request.contextPath}/livros">
+                Livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/livros?acao=meus">
+                Meus livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>
+
+            <a href="${pageContext.request.contextPath}/trocas">
+                Trocas
+            </a>
+
+            <a href="${pageContext.request.contextPath}/logout">
+                Sair
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+    <div class="page-header">
+
+        <h1>
+            Nova troca
+        </h1>
+
+    </div>
+
+    <div class="card">
+
+        <c:if test="${not empty erro}">
+
+            <div class="alert alert-erro">
+                ${erro}
             </div>
-            <div class="panel">
-                <div class="notice">Você está solicitando <strong>O Hobbit</strong>, de J. R. R. Tolkien.</div>
-                <div class="field"><label>Livro que você oferece</label><select class="select">
-                        <option>Clean Code — Robert C. Martin</option>
-                        <option>Dom Casmurro — Machado de Assis</option>
-                        <option>O Pequeno Príncipe — Antoine de Saint-Exupéry</option>
-                    </select></div>
-                <div class="field"><label>Mensagem (opcional)</label><textarea class="textarea" rows="4"
-                        placeholder="Escreva uma mensagem para o outro usuário..."></textarea></div>
-                <div class="actions"><button class="btn btn-primary">Enviar solicitação</button><a
-                        class="btn btn-outline" href="lista.jsp">Cancelar</a></div>
+
+        </c:if>
+
+        <form method="post"
+              action="${pageContext.request.contextPath}/trocas">
+
+            <div class="form-group">
+
+                <label for="livroOferecidoId">
+                    Meu livro
+                </label>
+
+                <select id="livroOferecidoId"
+                        name="livroOferecidoId"
+                        required>
+
+                    <option value="">
+                        Selecione seu livro
+                    </option>
+
+                    <c:forEach
+                            var="livro"
+                            items="${meusLivros}">
+
+                        <option value="${livro.id}">
+
+                            ${livro.titulo}
+                            - ${livro.autor}
+
+                        </option>
+
+                    </c:forEach>
+
+                </select>
+
             </div>
-        </div>
-    </main>
+
+            <div class="form-group">
+
+                <label for="livroRecebidoId">
+                    Livro que desejo receber
+                </label>
+
+                <select id="livroRecebidoId"
+                        name="livroRecebidoId"
+                        required>
+
+                    <option value="">
+                        Selecione um livro
+                    </option>
+
+                    <c:forEach
+                            var="livro"
+                            items="${livrosDisponiveis}">
+
+                        <option value="${livro.id}">
+
+                            ${livro.titulo}
+                            - ${livro.autor}
+                            (${livro.usuario.nome})
+
+                        </option>
+
+                    </c:forEach>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="mensagem">
+                    Mensagem / local da troca
+                </label>
+
+                <textarea id="mensagem"
+                          name="mensagem"
+                          rows="5"
+                          required
+                          placeholder="Ex.: Podemos realizar a troca na biblioteca da faculdade, na sexta-feira às 14h."></textarea>
+
+            </div>
+
+            <div class="actions">
+
+                <button type="submit"
+                        class="btn">
+
+                    Solicitar troca
+
+                </button>
+
+                <a class="btn btn-secondary"
+                   href="${pageContext.request.contextPath}/trocas">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
 </body>
 
 </html>

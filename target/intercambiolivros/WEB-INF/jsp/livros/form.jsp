@@ -34,7 +34,9 @@
 
     <div class="container">
 
-        <strong>Intercambio de Livros</strong>
+        <strong>
+            Intercambio de Livros
+        </strong>
 
         <nav>
 
@@ -48,6 +50,14 @@
 
             <a href="${pageContext.request.contextPath}/livros?acao=meus">
                 Meus livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>
+
+            <a href="${pageContext.request.contextPath}/trocas">
+                Trocas
             </a>
 
             <a href="${pageContext.request.contextPath}/logout">
@@ -99,7 +109,6 @@
                    name="id"
                    value="${livro.id}">
 
-
             <div class="form-group">
 
                 <label for="titulo">
@@ -114,7 +123,6 @@
 
             </div>
 
-
             <div class="form-group">
 
                 <label for="autor">
@@ -128,7 +136,6 @@
                        required>
 
             </div>
-
 
             <div class="actions">
 

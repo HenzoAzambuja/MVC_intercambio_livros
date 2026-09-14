@@ -51,14 +51,14 @@ CREATE TABLE livros (
     id BIGINT NOT NULL AUTO_INCREMENT,
     titulo VARCHAR(150) NOT NULL,
     autor VARCHAR(100) NOT NULL,
-    usuario_id BIGINT,
+    usuario_id BIGINT NOT NULL,
 
     PRIMARY KEY (id),
 
     CONSTRAINT fk_livro_usuario
         FOREIGN KEY (usuario_id)
         REFERENCES usuarios(id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================
@@ -67,8 +67,10 @@ CREATE TABLE livros (
 
 CREATE TABLE trocas (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    livro_oferecido_id BIGINT,
-    livro_recebido_id BIGINT,
+    livro_oferecido_id BIGINT NOT NULL,
+    livro_recebido_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+    mensagem TEXT NOT NULL,
 
     PRIMARY KEY (id),
 
@@ -79,7 +81,7 @@ CREATE TABLE trocas (
     CONSTRAINT fk_troca_livro_recebido
         FOREIGN KEY (livro_recebido_id)
         REFERENCES livros(id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- =========================================

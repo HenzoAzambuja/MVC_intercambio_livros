@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Minhas trocas - Intercambio de Livros
+        Trocas concluidas - Intercambio de Livros
     </title>
 
     <link rel="stylesheet"
@@ -69,43 +69,32 @@
         <div>
 
             <h1>
-                Minhas trocas
+                Trocas concluidas
             </h1>
 
             <p>
-                Acompanhe suas solicitações e trocas.
+                Historico das trocas realizadas.
             </p>
 
         </div>
 
         <a class="btn"
-           href="${pageContext.request.contextPath}/trocas?acao=nova">
+           href="${pageContext.request.contextPath}/trocas">
 
-            + Nova troca
+            Voltar para trocas
 
         </a>
 
     </div>
 
-    <c:if test="${not empty sessionScope.erroTroca}">
-
-        <div class="alert alert-erro">
-            ${sessionScope.erroTroca}
-        </div>
-
-        <c:remove var="erroTroca"
-                  scope="session"/>
-
-    </c:if>
-
     <c:choose>
 
-        <c:when test="${empty trocas}">
+        <c:when test="${empty trocasConcluidas}">
 
             <div class="card">
 
                 <p class="empty">
-                    Voce ainda nao possui trocas.
+                    Nenhuma troca concluida.
                 </p>
 
             </div>
@@ -118,7 +107,7 @@
 
                 <c:forEach
                         var="troca"
-                        items="${trocas}">
+                        items="${trocasConcluidas}">
 
                     <div class="menu-card">
 
@@ -129,7 +118,7 @@
                         <p>
 
                             <strong>
-                                Oferecido:
+                                Livro oferecido:
                             </strong>
 
                             ${troca.livroOferecido.titulo}
@@ -139,20 +128,10 @@
                         <p>
 
                             <strong>
-                                Recebido:
+                                Livro recebido:
                             </strong>
 
                             ${troca.livroRecebido.titulo}
-
-                        </p>
-
-                        <p>
-
-                            <strong>
-                                Usuario:
-                            </strong>
-
-                            ${troca.livroRecebido.usuario.nome}
 
                         </p>
 
@@ -172,46 +151,9 @@
                                 Status:
                             </strong>
 
-                            ${troca.status}
+                            Concluida
 
                         </p>
-
-                        <c:if test="${troca.status == 'PENDENTE'}">
-
-                            <div class="actions">
-
-                                <a href="${pageContext.request.contextPath}/trocas?acao=aceitar&id=${troca.id}"
-                                   class="btn">
-
-                                    Aceitar
-
-                                </a>
-
-                                <a href="${pageContext.request.contextPath}/trocas?acao=recusar&id=${troca.id}"
-                                   class="btn btn-secondary">
-
-                                    Recusar
-
-                                </a>
-
-                            </div>
-
-                        </c:if>
-
-                        <c:if test="${troca.status == 'ACEITA'}">
-
-                            <div class="actions">
-
-                                <a href="${pageContext.request.contextPath}/trocas?acao=concluir&id=${troca.id}"
-                                   class="btn">
-
-                                    Concluir troca
-
-                                </a>
-
-                            </div>
-
-                        </c:if>
 
                     </div>
 

@@ -26,7 +26,9 @@
 
     <div class="container">
 
-        <strong>Intercambio de Livros</strong>
+        <strong>
+            Intercambio de Livros
+        </strong>
 
         <nav>
 
@@ -40,6 +42,14 @@
 
             <a href="${pageContext.request.contextPath}/livros?acao=meus">
                 Meus livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>
+
+            <a href="${pageContext.request.contextPath}/trocas">
+                Trocas
             </a>
 
             <a href="${pageContext.request.contextPath}/logout">
@@ -69,7 +79,6 @@
 
     </div>
 
-
     <c:if test="${not empty erro}">
 
         <div class="alert alert-erro">
@@ -78,7 +87,6 @@
 
     </c:if>
 
-
     <c:choose>
 
         <c:when test="${empty livros}">
@@ -86,7 +94,7 @@
             <div class="card">
 
                 <p class="empty">
-                    Voce ainda nao cadastrou nenhum livro.
+                    Voce ainda nao possui livros cadastrados.
                 </p>
 
                 <a class="btn"
@@ -99,7 +107,6 @@
             </div>
 
         </c:when>
-
 
         <c:otherwise>
 

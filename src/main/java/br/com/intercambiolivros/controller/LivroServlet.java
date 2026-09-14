@@ -14,17 +14,26 @@ import java.io.IOException;
 @WebServlet("/livros")
 public class LivroServlet extends BaseServlet {
 
-    private static final String LISTA = "/WEB-INF/jsp/livros/lista.jsp";
-    private static final String MEUS = "/WEB-INF/jsp/livros/meus.jsp";
-    private static final String FORM = "/WEB-INF/jsp/livros/form.jsp";
+    private static final String LISTA =
+            "/WEB-INF/jsp/livros/lista.jsp";
 
-    private final LivroService livroService = new LivroService();
+    private static final String MEUS =
+            "/WEB-INF/jsp/livros/meus.jsp";
+
+    private static final String FORM =
+            "/WEB-INF/jsp/livros/form.jsp";
+
+    private final LivroService livroService =
+            new LivroService();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Usuario usuarioLogado = this.usuarioLogado(req);
+        Usuario usuarioLogado =
+                this.usuarioLogado(req);
 
         if (usuarioLogado == null) {
             this.redirect(req, resp, "/login");
@@ -32,16 +41,24 @@ public class LivroServlet extends BaseServlet {
         }
 
         switch (this.acao(req)) {
-            case "novo" -> this.form(req, resp, null);
+
+            case "novo" ->
+                    this.form(req, resp, null);
 
             case "editar" -> {
-                Livro livro = this.livroService.buscarPorId(
-                        this.paramLong(req, "id"));
+
+                Livro livro =
+                        this.livroService.buscarPorId(
+                                this.paramLong(req, "id"));
 
                 if (livro == null
-                        || !livro.getUsuarioId().equals(usuarioLogado.getId())) {
+                        || !livro.getUsuarioId()
+                        .equals(usuarioLogado.getId())) {
 
-                    req.setAttribute("erro", "Livro nao encontrado.");
+                    req.setAttribute(
+                            "erro",
+                            "Livro nao encontrado.");
+
                     req.setAttribute(
                             "livros",
                             this.livroService.listarPorUsuario(
@@ -55,25 +72,38 @@ public class LivroServlet extends BaseServlet {
             }
 
             case "excluir" -> {
+
                 try {
+
                     this.livroService.deletar(
                             this.paramLong(req, "id"),
                             usuarioLogado.getId());
 
-                    this.redirect(req, resp, "/livros?acao=meus");
+                    this.redirect(
+                            req,
+                            resp,
+                            "/livros?acao=meus");
 
                 } catch (IllegalArgumentException e) {
-                    req.setAttribute("erro", e.getMessage());
+
+                    req.setAttribute(
+                            "erro",
+                            e.getMessage());
+
                     req.setAttribute(
                             "livros",
                             this.livroService.listarPorUsuario(
                                     usuarioLogado.getId()));
 
-                    this.forward(req, resp, MEUS);
+                    this.forward(
+                            req,
+                            resp,
+                            MEUS);
                 }
             }
 
             case "meus" -> {
+
                 req.setAttribute(
                         "livros",
                         this.livroService.listarPorUsuario(
@@ -83,6 +113,7 @@ public class LivroServlet extends BaseServlet {
             }
 
             default -> {
+
                 req.setAttribute(
                         "livros",
                         this.livroService.listarDisponiveis(
@@ -94,12 +125,15 @@ public class LivroServlet extends BaseServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(
+            HttpServletRequest req,
+            HttpServletResponse resp)
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
 
-        Usuario usuarioLogado = this.usuarioLogado(req);
+        Usuario usuarioLogado =
+                this.usuarioLogado(req);
 
         if (usuarioLogado == null) {
             this.redirect(req, resp, "/login");
@@ -109,14 +143,22 @@ public class LivroServlet extends BaseServlet {
         Livro livro = this.fromRequest(req);
 
         try {
+
             this.livroService.salvar(
                     livro,
                     usuarioLogado.getId());
 
-            this.redirect(req, resp, "/livros?acao=meus");
+            this.redirect(
+                    req,
+                    resp,
+                    "/livros?acao=meus");
 
         } catch (IllegalArgumentException e) {
-            req.setAttribute("erro", e.getMessage());
+
+            req.setAttribute(
+                    "erro",
+                    e.getMessage());
+
             this.form(req, resp, livro);
         }
     }
@@ -132,7 +174,8 @@ public class LivroServlet extends BaseServlet {
         this.forward(req, resp, FORM);
     }
 
-    private Livro fromRequest(HttpServletRequest req) {
+    private Livro fromRequest(
+            HttpServletRequest req) {
 
         Livro livro = new Livro();
 
@@ -148,15 +191,18 @@ public class LivroServlet extends BaseServlet {
         return livro;
     }
 
-    private Usuario usuarioLogado(HttpServletRequest req) {
+    private Usuario usuarioLogado(
+            HttpServletRequest req) {
 
-        HttpSession session = req.getSession(false);
+        HttpSession session =
+                req.getSession(false);
 
         if (session == null) {
             return null;
         }
 
-        Object usuario = session.getAttribute("usuarioLogado");
+        Object usuario =
+                session.getAttribute("usuarioLogado");
 
         if (usuario instanceof Usuario) {
             return (Usuario) usuario;

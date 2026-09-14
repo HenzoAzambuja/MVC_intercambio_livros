@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Livros disponíveis - Intercambio de Livros
+        Livros disponiveis - Intercambio de Livros
     </title>
 
     <link rel="stylesheet"
@@ -26,7 +26,9 @@
 
     <div class="container">
 
-        <strong>Intercambio de Livros</strong>
+        <strong>
+            Intercambio de Livros
+        </strong>
 
         <nav>
 
@@ -40,6 +42,14 @@
 
             <a href="${pageContext.request.contextPath}/livros?acao=meus">
                 Meus livros
+            </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>
+
+            <a href="${pageContext.request.contextPath}/trocas">
+                Trocas
             </a>
 
             <a href="${pageContext.request.contextPath}/logout">
@@ -56,28 +66,19 @@
 
     <div class="page-header">
 
-        <h1>
-            Livros disponiveis
-        </h1>
+        <div>
 
-        <a class="btn"
-           href="${pageContext.request.contextPath}/livros?acao=meus">
+            <h1>
+                Livros disponiveis
+            </h1>
 
-            Meus livros
+            <p>
+                Encontre livros de outras pessoas para intercambio.
+            </p>
 
-        </a>
-
-    </div>
-
-
-    <c:if test="${not empty erro}">
-
-        <div class="alert alert-erro">
-            ${erro}
         </div>
 
-    </c:if>
-
+    </div>
 
     <c:choose>
 
@@ -93,7 +94,6 @@
 
         </c:when>
 
-
         <c:otherwise>
 
             <div class="grid-cards">
@@ -102,18 +102,16 @@
 
                     <div class="menu-card">
 
-                        <strong>
+                        <h3>
                             ${livro.titulo}
-                        </strong>
+                        </h3>
+
+                        <p>
+                            ${livro.autor}
+                        </p>
 
                         <span>
-                            Autor: ${livro.autor}
-                        </span>
-
-                        <br>
-
-                        <span>
-                            Proprietario: ${livro.usuario.nome}
+                            Dono: ${livro.usuario.nome}
                         </span>
 
                     </div>
