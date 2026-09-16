@@ -142,6 +142,16 @@
                         </p>
 
                         <p>
+                            <strong>Quem ofereceu:</strong>
+                            ${troca.livroOferecido.usuario.nome}
+                        </p>
+
+                        <p>
+                            <strong>Quem recebeu:</strong>
+                            ${troca.livroRecebido.usuario.nome}
+                        </p>
+
+                        <p>
 
                             <strong>
                                 Mensagem:

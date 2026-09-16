@@ -102,6 +102,22 @@ public class LivroServlet extends BaseServlet {
                 }
             }
 
+                        case "disponibilidade" -> {
+
+                                try {
+                                        this.livroService.alterarDisponibilidade(
+                                                        this.paramLong(req, "id"),
+                                                        usuarioLogado.getId());
+
+                                        this.redirect(req, resp, "/livros?acao=meus");
+                                } catch (IllegalArgumentException e) {
+                                        req.setAttribute("erro", e.getMessage());
+                                        req.setAttribute("livros", this.livroService.listarPorUsuario(
+                                                        usuarioLogado.getId()));
+                                        this.forward(req, resp, MEUS);
+                                }
+                        }
+
             case "meus" -> {
 
                 req.setAttribute(

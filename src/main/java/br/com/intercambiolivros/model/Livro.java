@@ -6,6 +6,7 @@ public class Livro {
     private String titulo;
     private String autor;
     private Long usuarioId;
+    private boolean disponivel;
     private Usuario usuario;
 
     public Long getId() {
@@ -38,6 +39,14 @@ public class Livro {
 
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
     }
 
     public Usuario getUsuario() {

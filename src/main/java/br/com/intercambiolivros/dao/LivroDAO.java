@@ -17,18 +17,17 @@ public class LivroDAO extends MysqlDAO {
     public List<Livro> listarTodos() {
 
         String sql =
-                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, l.disponivel, "
                         + "u.nome AS usuario_nome, "
                         + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
-                        + "WHERE NOT EXISTS ("
+                        + "WHERE l.disponivel = TRUE "
+                        + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
-                        + "WHERE t.status = 'CONCLUIDA' "
-                        + "AND ("
-                        + "t.livro_oferecido_id = l.id "
-                        + "OR t.livro_recebido_id = l.id"
-                        + ")) "
+                        + "WHERE t.status IN ('PENDENTE', 'ACEITA') "
+                        + "AND (t.livro_oferecido_id = l.id "
+                        + "OR t.livro_recebido_id = l.id)) "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -50,15 +49,16 @@ public class LivroDAO extends MysqlDAO {
     public List<Livro> listarDisponiveis(Long usuarioId) {
 
         String sql =
-                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, l.disponivel, "
                         + "u.nome AS usuario_nome, "
                         + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id <> ? "
+                        + "AND l.disponivel = TRUE "
                         + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
-                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "WHERE t.status IN ('PENDENTE', 'ACEITA', 'CONCLUIDA') "
                         + "AND ("
                         + "t.livro_oferecido_id = l.id "
                         + "OR t.livro_recebido_id = l.id"
@@ -84,19 +84,12 @@ public class LivroDAO extends MysqlDAO {
     public List<Livro> listarPorUsuario(Long usuarioId) {
 
         String sql =
-                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, l.disponivel, "
                         + "u.nome AS usuario_nome, "
                         + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id = ? "
-                        + "AND NOT EXISTS ("
-                        + "SELECT 1 FROM trocas t "
-                        + "WHERE t.status = 'CONCLUIDA' "
-                        + "AND ("
-                        + "t.livro_oferecido_id = l.id "
-                        + "OR t.livro_recebido_id = l.id"
-                        + ")) "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -118,15 +111,16 @@ public class LivroDAO extends MysqlDAO {
     public List<Livro> listarDisponiveisPorUsuario(Long usuarioId) {
 
         String sql =
-                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, l.disponivel, "
                         + "u.nome AS usuario_nome, "
                         + "u.email AS usuario_email "
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id = ? "
+                        + "AND l.disponivel = TRUE "
                         + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
-                        + "WHERE t.status = 'CONCLUIDA' "
+                        + "WHERE t.status IN ('PENDENTE', 'ACEITA') "
                         + "AND ("
                         + "t.livro_oferecido_id = l.id "
                         + "OR t.livro_recebido_id = l.id"
@@ -152,7 +146,7 @@ public class LivroDAO extends MysqlDAO {
     public Livro buscarPorId(Long id) {
 
         String sql =
-                "SELECT l.id, l.titulo, l.autor, l.usuario_id, "
+                "SELECT l.id, l.titulo, l.autor, l.usuario_id, l.disponivel, "
                         + "u.nome AS usuario_nome, "
                         + "u.email AS usuario_email "
                         + "FROM livros l "
@@ -177,8 +171,8 @@ public class LivroDAO extends MysqlDAO {
 
         String sql =
                 "INSERT INTO livros "
-                        + "(titulo, autor, usuario_id) "
-                        + "VALUES (?, ?, ?)";
+                + "(titulo, autor, usuario_id, disponivel) "
+                + "VALUES (?, ?, ?, FALSE)";
 
         try {
 
@@ -215,6 +209,19 @@ public class LivroDAO extends MysqlDAO {
         }
     }
 
+    public void alterarDisponibilidade(Long id, boolean disponivel) {
+
+        String sql =
+                "UPDATE livros SET disponivel = ? WHERE id = ?";
+
+        try {
+            super.executarUpdate(sql, disponivel, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Erro ao alterar disponibilidade do livro.", e);
+        }
+    }
+
     public boolean existeTrocaParaLivro(Long livroId) {
 
         String sql =
@@ -236,6 +243,22 @@ public class LivroDAO extends MysqlDAO {
         }
 
         return false;
+    }
+
+    public boolean existeTrocaAtivaParaLivro(Long livroId) {
+
+        String sql =
+                "SELECT COUNT(*) AS total FROM trocas "
+                        + "WHERE status IN ('PENDENTE', 'ACEITA') "
+                        + "AND (livro_oferecido_id = ? "
+                        + "OR livro_recebido_id = ?)";
+
+        try (ResultSet rs = super.executar(sql, livroId, livroId)) {
+            return rs.next() && rs.getInt("total") > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Erro ao verificar troca ativa do livro.", e);
+        }
     }
 
     public void deletar(Long id) {
@@ -263,6 +286,7 @@ public class LivroDAO extends MysqlDAO {
         livro.setTitulo(rs.getString("titulo"));
         livro.setAutor(rs.getString("autor"));
         livro.setUsuarioId(rs.getLong("usuario_id"));
+        livro.setDisponivel(rs.getBoolean("disponivel"));
 
         Usuario usuario = new Usuario();
 

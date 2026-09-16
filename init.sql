@@ -52,6 +52,7 @@ CREATE TABLE livros (
     titulo VARCHAR(150) NOT NULL,
     autor VARCHAR(100) NOT NULL,
     usuario_id BIGINT NOT NULL,
+    disponivel BOOLEAN NOT NULL DEFAULT FALSE,
 
     PRIMARY KEY (id),
 
@@ -69,6 +70,8 @@ CREATE TABLE trocas (
     id BIGINT NOT NULL AUTO_INCREMENT,
     livro_oferecido_id BIGINT NOT NULL,
     livro_recebido_id BIGINT NOT NULL,
+    usuario_oferecedor_id BIGINT NOT NULL,
+    usuario_recebedor_id BIGINT NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
     mensagem TEXT NOT NULL,
 
@@ -144,33 +147,39 @@ VALUES
 INSERT INTO livros (
     titulo,
     autor,
-    usuario_id
+    usuario_id,
+    disponivel
 )
 VALUES
     (
         'Dom Casmurro',
         'Machado de Assis',
-        2
+        2,
+        TRUE
     ),
     (
         'Harry Potter e a Pedra Filosofal',
         'J.K. Rowling',
-        2
+        2,
+        TRUE
     ),
     (
         'A Luta pelo Direito',
         'Rudolf von Jhering',
-        3
+        3,
+        TRUE
     ),
     (
         '1984',
         'George Orwell',
-        3
+        3,
+        TRUE
     ),
     (
         'Madame Bovary',
         'Gustave Flaubert',
-        4
+        4,
+        TRUE
     );
 
 

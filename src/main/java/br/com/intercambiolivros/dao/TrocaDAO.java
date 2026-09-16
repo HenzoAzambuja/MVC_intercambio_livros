@@ -20,8 +20,9 @@ public class TrocaDAO extends MysqlDAO {
         String sql =
                 "INSERT INTO trocas "
                         + "(livro_oferecido_id, livro_recebido_id, "
+                        + "usuario_oferecedor_id, usuario_recebedor_id, "
                         + "status, mensagem) "
-                        + "VALUES (?, ?, ?, ?)";
+                        + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
 
@@ -29,6 +30,8 @@ public class TrocaDAO extends MysqlDAO {
                     sql,
                     troca.getLivroOferecidoId(),
                     troca.getLivroRecebidoId(),
+                    troca.getUsuarioOferecedorId(),
+                    troca.getUsuarioRecebedorId(),
                     troca.getStatus(),
                     troca.getMensagem());
 
@@ -45,25 +48,27 @@ public class TrocaDAO extends MysqlDAO {
                         + "t.id AS troca_id, "
                         + "t.livro_oferecido_id, "
                         + "t.livro_recebido_id, "
+                        + "t.usuario_oferecedor_id, "
+                        + "t.usuario_recebedor_id, "
                         + "t.status, "
                         + "t.mensagem, "
                         + "lo.titulo AS oferecido_titulo, "
                         + "lo.autor AS oferecido_autor, "
-                        + "lo.usuario_id AS oferecido_usuario_id, "
+                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
                         + "uo.nome AS oferecido_usuario_nome, "
                         + "lr.titulo AS recebido_titulo, "
                         + "lr.autor AS recebido_autor, "
-                        + "lr.usuario_id AS recebido_usuario_id, "
+                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
                         + "ur.nome AS recebido_usuario_nome "
                         + "FROM trocas t "
                         + "INNER JOIN livros lo "
                         + "ON lo.id = t.livro_oferecido_id "
                         + "INNER JOIN usuarios uo "
-                        + "ON uo.id = lo.usuario_id "
+                        + "ON uo.id = t.usuario_oferecedor_id "
                         + "INNER JOIN livros lr "
                         + "ON lr.id = t.livro_recebido_id "
                         + "INNER JOIN usuarios ur "
-                        + "ON ur.id = lr.usuario_id "
+                        + "ON ur.id = t.usuario_recebedor_id "
                         + "WHERE t.id = ?";
 
         try (ResultSet rs = super.executar(sql, id)) {
@@ -87,27 +92,29 @@ public class TrocaDAO extends MysqlDAO {
                         + "t.id AS troca_id, "
                         + "t.livro_oferecido_id, "
                         + "t.livro_recebido_id, "
+                        + "t.usuario_oferecedor_id, "
+                        + "t.usuario_recebedor_id, "
                         + "t.status, "
                         + "t.mensagem, "
                         + "lo.titulo AS oferecido_titulo, "
                         + "lo.autor AS oferecido_autor, "
-                        + "lo.usuario_id AS oferecido_usuario_id, "
+                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
                         + "uo.nome AS oferecido_usuario_nome, "
                         + "lr.titulo AS recebido_titulo, "
                         + "lr.autor AS recebido_autor, "
-                        + "lr.usuario_id AS recebido_usuario_id, "
+                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
                         + "ur.nome AS recebido_usuario_nome "
                         + "FROM trocas t "
                         + "INNER JOIN livros lo "
                         + "ON lo.id = t.livro_oferecido_id "
                         + "INNER JOIN usuarios uo "
-                        + "ON uo.id = lo.usuario_id "
+                        + "ON uo.id = t.usuario_oferecedor_id "
                         + "INNER JOIN livros lr "
                         + "ON lr.id = t.livro_recebido_id "
                         + "INNER JOIN usuarios ur "
-                        + "ON ur.id = lr.usuario_id "
-                        + "WHERE lo.usuario_id = ? "
-                        + "OR lr.usuario_id = ? "
+                        + "ON ur.id = t.usuario_recebedor_id "
+                        + "WHERE t.usuario_oferecedor_id = ? "
+                        + "OR t.usuario_recebedor_id = ? "
                         + "ORDER BY t.id DESC";
 
         List<Troca> lista = new ArrayList<>();
@@ -135,27 +142,29 @@ public class TrocaDAO extends MysqlDAO {
                         + "t.id AS troca_id, "
                         + "t.livro_oferecido_id, "
                         + "t.livro_recebido_id, "
+                        + "t.usuario_oferecedor_id, "
+                        + "t.usuario_recebedor_id, "
                         + "t.status, "
                         + "t.mensagem, "
                         + "lo.titulo AS oferecido_titulo, "
                         + "lo.autor AS oferecido_autor, "
-                        + "lo.usuario_id AS oferecido_usuario_id, "
+                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
                         + "uo.nome AS oferecido_usuario_nome, "
                         + "lr.titulo AS recebido_titulo, "
                         + "lr.autor AS recebido_autor, "
-                        + "lr.usuario_id AS recebido_usuario_id, "
+                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
                         + "ur.nome AS recebido_usuario_nome "
                         + "FROM trocas t "
                         + "INNER JOIN livros lo "
                         + "ON lo.id = t.livro_oferecido_id "
                         + "INNER JOIN usuarios uo "
-                        + "ON uo.id = lo.usuario_id "
+                        + "ON uo.id = t.usuario_oferecedor_id "
                         + "INNER JOIN livros lr "
                         + "ON lr.id = t.livro_recebido_id "
                         + "INNER JOIN usuarios ur "
-                        + "ON ur.id = lr.usuario_id "
+                        + "ON ur.id = t.usuario_recebedor_id "
                         + "WHERE t.status = 'PENDENTE' "
-                        + "AND lr.usuario_id = ? "
+                        + "AND t.usuario_recebedor_id = ? "
                         + "ORDER BY t.id DESC";
 
         List<Troca> lista = new ArrayList<>();
@@ -183,28 +192,30 @@ public class TrocaDAO extends MysqlDAO {
                         + "t.id AS troca_id, "
                         + "t.livro_oferecido_id, "
                         + "t.livro_recebido_id, "
+                        + "t.usuario_oferecedor_id, "
+                        + "t.usuario_recebedor_id, "
                         + "t.status, "
                         + "t.mensagem, "
                         + "lo.titulo AS oferecido_titulo, "
                         + "lo.autor AS oferecido_autor, "
-                        + "lo.usuario_id AS oferecido_usuario_id, "
+                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
                         + "uo.nome AS oferecido_usuario_nome, "
                         + "lr.titulo AS recebido_titulo, "
                         + "lr.autor AS recebido_autor, "
-                        + "lr.usuario_id AS recebido_usuario_id, "
+                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
                         + "ur.nome AS recebido_usuario_nome "
                         + "FROM trocas t "
                         + "INNER JOIN livros lo "
                         + "ON lo.id = t.livro_oferecido_id "
                         + "INNER JOIN usuarios uo "
-                        + "ON uo.id = lo.usuario_id "
+                        + "ON uo.id = t.usuario_oferecedor_id "
                         + "INNER JOIN livros lr "
                         + "ON lr.id = t.livro_recebido_id "
                         + "INNER JOIN usuarios ur "
-                        + "ON ur.id = lr.usuario_id "
+                        + "ON ur.id = t.usuario_recebedor_id "
                         + "WHERE t.status = 'CONCLUIDA' "
-                        + "AND (lo.usuario_id = ? "
-                        + "OR lr.usuario_id = ?) "
+                        + "AND (t.usuario_oferecedor_id = ? "
+                        + "OR t.usuario_recebedor_id = ?) "
                         + "ORDER BY t.id DESC";
 
         List<Troca> lista = new ArrayList<>();
@@ -301,6 +312,22 @@ public class TrocaDAO extends MysqlDAO {
         }
     }
 
+        public void concluir(Troca troca, Long usuarioOferecedor,
+                                                 Long usuarioRecebedor) {
+
+                try {
+                        this.banco.concluirTroca(
+                                        troca.getId(),
+                                        troca.getLivroOferecidoId(),
+                                        troca.getLivroRecebidoId(),
+                                        usuarioOferecedor,
+                                        usuarioRecebedor);
+                } catch (SQLException e) {
+                        throw new RuntimeException(
+                                        "Erro ao concluir troca.", e);
+                }
+        }
+
     private Troca mapear(ResultSet rs)
             throws SQLException {
 
@@ -314,6 +341,12 @@ public class TrocaDAO extends MysqlDAO {
 
         troca.setLivroRecebidoId(
                 rs.getLong("livro_recebido_id"));
+
+        troca.setUsuarioOferecedorId(
+                rs.getLong("usuario_oferecedor_id"));
+
+        troca.setUsuarioRecebedorId(
+                rs.getLong("usuario_recebedor_id"));
 
         troca.setStatus(
                 rs.getString("status"));

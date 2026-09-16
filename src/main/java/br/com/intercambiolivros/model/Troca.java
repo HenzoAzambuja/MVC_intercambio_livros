@@ -5,6 +5,8 @@ public class Troca {
     private Long id;
     private Long livroOferecidoId;
     private Long livroRecebidoId;
+    private Long usuarioOferecedorId;
+    private Long usuarioRecebedorId;
     private String status;
     private String mensagem;
 
@@ -33,6 +35,22 @@ public class Troca {
 
     public void setLivroRecebidoId(Long livroRecebidoId) {
         this.livroRecebidoId = livroRecebidoId;
+    }
+
+    public Long getUsuarioOferecedorId() {
+        return usuarioOferecedorId;
+    }
+
+    public void setUsuarioOferecedorId(Long usuarioOferecedorId) {
+        this.usuarioOferecedorId = usuarioOferecedorId;
+    }
+
+    public Long getUsuarioRecebedorId() {
+        return usuarioRecebedorId;
+    }
+
+    public void setUsuarioRecebedorId(Long usuarioRecebedorId) {
+        this.usuarioRecebedorId = usuarioRecebedorId;
     }
 
     public String getStatus() {

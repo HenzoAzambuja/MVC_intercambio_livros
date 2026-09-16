@@ -76,6 +76,12 @@ public class TrocaService {
                     "O livro recebido deve pertencer a outra pessoa.");
         }
 
+        if (!livroOferecido.isDisponivel()
+                || !livroRecebido.isDisponivel()) {
+            throw new IllegalArgumentException(
+                    "Os dois livros precisam estar disponiveis para troca.");
+        }
+
         if (this.trocaDAO
                 .existeTrocaAtivaOuConcluidaParaLivro(
                         livroOferecidoId)) {
@@ -99,6 +105,9 @@ public class TrocaService {
 
         troca.setLivroRecebidoId(
                 livroRecebidoId);
+
+        troca.setUsuarioOferecedorId(usuarioId);
+        troca.setUsuarioRecebedorId(livroRecebido.getUsuarioId());
 
         troca.setStatus("PENDENTE");
 
@@ -223,9 +232,15 @@ public class TrocaService {
                     "Voce nao participa desta troca.");
         }
 
-        this.trocaDAO.alterarStatus(
-                trocaId,
-                "CONCLUIDA");
+        Long usuarioOferecedor =
+                troca.getLivroOferecido().getUsuarioId();
+        Long usuarioRecebedor =
+                troca.getLivroRecebido().getUsuarioId();
+
+        this.trocaDAO.concluir(
+                troca,
+                usuarioOferecedor,
+                usuarioRecebedor);
     }
 
     private void validarTrocaPendente(
@@ -254,7 +269,7 @@ public class TrocaService {
                 .equals(usuarioId)) {
 
             throw new IllegalArgumentException(
-                    "Voce nao pode responder esta troca.");
+                    "Você não pode responder esta troca.");
         }
     }
 

@@ -91,6 +91,13 @@
 
         </a>
 
+        <a class="btn btn-secondary"
+           href="${pageContext.request.contextPath}/trocas?acao=concluidas">
+
+            Trocas concluidas
+
+        </a>
+
     </div>
 
     <c:if test="${not empty sessionScope.erroTroca}">
@@ -160,6 +167,16 @@
 
                             ${troca.livroRecebido.usuario.nome}
 
+                        </p>
+
+                        <p>
+                            <strong>Quem oferece:</strong>
+                            ${troca.livroOferecido.usuario.nome}
+                        </p>
+
+                        <p>
+                            <strong>Quem recebe:</strong>
+                            ${troca.livroRecebido.usuario.nome}
                         </p>
 
                         <p>

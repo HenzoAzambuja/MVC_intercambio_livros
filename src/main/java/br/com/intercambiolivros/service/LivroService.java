@@ -56,6 +56,35 @@ public class LivroService {
         return this.livroDAO.buscarPorId(id);
     }
 
+    public void alterarDisponibilidade(Long id, Long usuarioId) {
+
+        if (id == null || usuarioId == null) {
+            throw new IllegalArgumentException(
+                    "Livro e usuario sao obrigatorios.");
+        }
+
+        Livro livro = this.livroDAO.buscarPorId(id);
+
+        if (livro == null) {
+            throw new IllegalArgumentException(
+                    "Livro nao encontrado.");
+        }
+
+        if (!livro.getUsuarioId().equals(usuarioId)) {
+            throw new IllegalArgumentException(
+                    "Voce nao pode alterar este livro.");
+        }
+
+        if (this.livroDAO.existeTrocaAtivaParaLivro(id)) {
+            throw new IllegalArgumentException(
+                    "Este livro esta envolvido em uma troca.");
+        }
+
+        this.livroDAO.alterarDisponibilidade(
+                id,
+                !livro.isDisponivel());
+    }
+
     public void salvar(Livro livro, Long usuarioId) {
 
         if (livro == null) {

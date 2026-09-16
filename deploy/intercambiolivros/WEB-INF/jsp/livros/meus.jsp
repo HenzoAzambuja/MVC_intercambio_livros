@@ -127,6 +127,7 @@
                         <th>ID</th>
                         <th>Titulo</th>
                         <th>Autor</th>
+                        <th>Disponibilidade</th>
                         <th>Acoes</th>
 
                     </tr>
@@ -151,7 +152,25 @@
                                 ${livro.autor}
                             </td>
 
+                            <td>
+                                <c:choose>
+                                    <c:when test="${livro.disponivel}">
+                                        Disponivel para troca
+                                    </c:when>
+                                    <c:otherwise>
+                                        Indisponivel
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+
                             <td class="links">
+
+                                <a href="${pageContext.request.contextPath}/livros?acao=disponibilidade&id=${livro.id}">
+                                    <c:choose>
+                                        <c:when test="${livro.disponivel}">Tornar indisponivel</c:when>
+                                        <c:otherwise>Disponibilizar para troca</c:otherwise>
+                                    </c:choose>
+                                </a>
 
                                 <a href="${pageContext.request.contextPath}/livros?acao=editar&id=${livro.id}">
                                     Editar
