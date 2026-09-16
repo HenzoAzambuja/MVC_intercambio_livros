@@ -159,7 +159,7 @@
 
                         </p>
 
-                        <p>
+                        <!-- <p>
 
                             <strong>
                                 Usuario:
@@ -167,7 +167,7 @@
 
                             ${troca.livroRecebido.usuario.nome}
 
-                        </p>
+                        </p> -->
 
                         <p>
                             <strong>Quem oferece:</strong>

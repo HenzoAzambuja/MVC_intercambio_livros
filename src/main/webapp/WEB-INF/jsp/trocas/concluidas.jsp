@@ -44,13 +44,14 @@
                 Meus livros
             </a>
 
-            <a href="${pageContext.request.contextPath}/pessoas">
-                Pessoas
-            </a>
 
             <a href="${pageContext.request.contextPath}/trocas">
                 Trocas
             </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>            
 
             <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
                 <a href="${pageContext.request.contextPath}/usuarios">

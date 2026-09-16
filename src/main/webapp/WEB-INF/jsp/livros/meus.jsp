@@ -37,7 +37,7 @@
             </a>
 
             <a href="${pageContext.request.contextPath}/livros">
-                Livros disponiveis
+                Livros
             </a>
 
             <a href="${pageContext.request.contextPath}/livros?acao=meus">
