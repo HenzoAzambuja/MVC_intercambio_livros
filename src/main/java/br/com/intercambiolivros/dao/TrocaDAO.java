@@ -269,7 +269,7 @@ public class TrocaDAO extends MysqlDAO {
                 "SELECT COUNT(*) AS total "
                         + "FROM trocas "
                         + "WHERE status IN "
-                        + "('PENDENTE', 'ACEITA', 'CONCLUIDA') "
+                        + "('PENDENTE', 'ACEITA') "
                         + "AND ("
                         + "livro_oferecido_id = ? "
                         + "OR livro_recebido_id = ?"
@@ -312,21 +312,38 @@ public class TrocaDAO extends MysqlDAO {
         }
     }
 
-        public void concluir(Troca troca, Long usuarioOferecedor,
-                                                 Long usuarioRecebedor) {
+    public void concluir(Troca troca, Long usuarioOferecedor,
+                         Long usuarioRecebedor) {
 
-                try {
-                        this.banco.concluirTroca(
-                                        troca.getId(),
-                                        troca.getLivroOferecidoId(),
-                                        troca.getLivroRecebidoId(),
-                                        usuarioOferecedor,
-                                        usuarioRecebedor);
-                } catch (SQLException e) {
-                        throw new RuntimeException(
-                                        "Erro ao concluir troca.", e);
-                }
+        String atualizarTroca =
+                "UPDATE trocas SET status = 'CONCLUIDA' "
+                        + "WHERE id = ? AND status = 'ACEITA'";
+
+        String transferirLivros =
+                "UPDATE livros SET usuario_id = CASE id "
+                        + "WHEN ? THEN ? WHEN ? THEN ? END, "
+                        + "disponivel = FALSE "
+                        + "WHERE id IN (?, ?)";
+
+        try {
+            super.executarUpdate(
+                    atualizarTroca,
+                    troca.getId());
+
+            super.executarUpdate(
+                    transferirLivros,
+                    troca.getLivroOferecidoId(),
+                    usuarioRecebedor,
+                    troca.getLivroRecebidoId(),
+                    usuarioOferecedor,
+                    troca.getLivroOferecidoId(),
+                    troca.getLivroRecebidoId());
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Erro ao concluir troca.", e);
         }
+    }
 
     private Troca mapear(ResultSet rs)
             throws SQLException {

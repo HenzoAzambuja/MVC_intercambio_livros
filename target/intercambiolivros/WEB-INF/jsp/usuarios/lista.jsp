@@ -10,7 +10,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Usuarios - Intercambio de Livros</title>
+    <title>Usuarios - BookSwap</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/estilo.css">
@@ -23,7 +23,7 @@
 
     <div class="container">
 
-        <strong>Intercambio de Livros</strong>
+        <strong>BookSwap</strong>
 
         <nav>
 
@@ -68,7 +68,7 @@
     <c:if test="${not empty erro}">
 
         <div class="alert alert-erro">
-            ${erro}
+            <c:out value="${erro}" />
         </div>
 
     </c:if>
@@ -116,19 +116,19 @@
                             </td>
 
                             <td>
-                                ${usuario.nome}
+                                <c:out value="${usuario.nome}" />
                             </td>
 
                             <td>
-                                ${usuario.email}
+                                <c:out value="${usuario.email}" />
                             </td>
 
                             <td>
-                                ${usuario.login}
+                                <c:out value="${usuario.login}" />
                             </td>
 
                             <td>
-                                ${usuario.perfil.nome}
+                                <c:out value="${usuario.perfil.nome}" />
                             </td>
 
                             <td class="links">
@@ -138,9 +138,9 @@
                                 </a>
 
                                 <a href="${pageContext.request.contextPath}/usuarios?acao=excluir&id=${usuario.id}"
-                                   onclick="return confirm('Excluir este usuario?');">
+                                   onclick="return confirm('Desativar este usuario?');">
 
-                                    Excluir
+                                    Desativar
 
                                 </a>
 

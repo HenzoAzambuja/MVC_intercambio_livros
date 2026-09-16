@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Nova troca - Intercambio de Livros
+        Nova troca - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -27,7 +27,7 @@
     <div class="container">
 
         <strong>
-            Intercambio de Livros
+            BookSwap
         </strong>
 
         <nav>
@@ -83,7 +83,7 @@
         <c:if test="${not empty erro}">
 
             <div class="alert alert-erro">
-                ${erro}
+                <c:out value="${erro}" />
             </div>
 
         </c:if>
@@ -111,8 +111,8 @@
 
                         <option value="${livro.id}">
 
-                            ${livro.titulo}
-                            - ${livro.autor}
+                            <c:out value="${livro.titulo}" />
+                            - <c:out value="${livro.autor}" />
 
                         </option>
 
@@ -142,9 +142,9 @@
 
                         <option value="${livro.id}">
 
-                            ${livro.titulo}
-                            - ${livro.autor}
-                            (${livro.usuario.nome})
+                            <c:out value="${livro.titulo}" />
+                            - <c:out value="${livro.autor}" />
+                            (<c:out value="${livro.usuario.nome}" />)
 
                         </option>
 

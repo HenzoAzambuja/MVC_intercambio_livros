@@ -8,6 +8,7 @@ public class Usuario {
     private String login;
     private String senha;
     private Long perfilId;
+    private boolean ativo;
     private Perfil perfil;
 
     public Long getId() {
@@ -56,6 +57,14 @@ public class Usuario {
 
     public void setPerfilId(Long perfilId) {
         this.perfilId = perfilId;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     public Perfil getPerfil() {

@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Livros disponiveis - Intercambio de Livros
+        Livros disponiveis - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -27,7 +27,7 @@
     <div class="container">
 
         <strong>
-            Intercambio de Livros
+            BookSwap
         </strong>
 
         <nav>
@@ -109,15 +109,15 @@
                     <div class="menu-card">
 
                         <h3>
-                            ${livro.titulo}
+                            <c:out value="${livro.titulo}" />
                         </h3>
 
                         <p>
-                            ${livro.autor}
+                            <c:out value="${livro.autor}" />
                         </p>
 
                         <span>
-                            Dono: ${livro.usuario.nome}
+                            Dono: <c:out value="${livro.usuario.nome}" />
                         </span>
 
                     </div>

@@ -28,7 +28,7 @@
 
         <c:if test="${not empty erro}">
             <div class="alert alert-erro">
-                ${erro}
+                <c:out value="${erro}" />
             </div>
         </c:if>
 

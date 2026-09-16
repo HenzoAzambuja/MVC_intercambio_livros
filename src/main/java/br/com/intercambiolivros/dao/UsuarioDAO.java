@@ -23,10 +23,11 @@ public class UsuarioDAO extends MysqlDAO {
 
         String sql =
                 "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                        + "u.perfil_id, p.nome AS perfil_nome "
+                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
                         + "FROM usuarios u "
                         + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                        + "WHERE u.login = ? AND u.senha = ?";
+                    + "WHERE u.login = ? AND u.senha = ? "
+                    + "AND u.ativo = TRUE";
 
         try (ResultSet rs = super.executar(sql, login, senha)) {
 
@@ -45,9 +46,10 @@ public class UsuarioDAO extends MysqlDAO {
 
         String sql =
                 "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                        + "u.perfil_id, p.nome AS perfil_nome "
+                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
                         + "FROM usuarios u "
                         + "INNER JOIN perfis p ON p.id = u.perfil_id "
+                    + "WHERE u.ativo = TRUE "
                         + "ORDER BY u.nome";
 
         List<Usuario> lista = new ArrayList<>();
@@ -69,7 +71,7 @@ public class UsuarioDAO extends MysqlDAO {
 
         String sql =
                 "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                        + "u.perfil_id, p.nome AS perfil_nome "
+                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
                         + "FROM usuarios u "
                         + "INNER JOIN perfis p ON p.id = u.perfil_id "
                         + "WHERE u.id = ?";
@@ -91,7 +93,7 @@ public class UsuarioDAO extends MysqlDAO {
 
         String sql =
                 "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                        + "u.perfil_id, p.nome AS perfil_nome "
+                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
                         + "FROM usuarios u "
                         + "INNER JOIN perfis p ON p.id = u.perfil_id "
                         + "WHERE u.login = ?";
@@ -111,9 +113,9 @@ public class UsuarioDAO extends MysqlDAO {
 
     public Usuario buscarPorEmail(String email) {
 
-    String sql =
+        String sql =
             "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, p.nome AS perfil_nome "
+                + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
                     + "FROM usuarios u "
                     + "INNER JOIN perfis p ON p.id = u.perfil_id "
                     + "WHERE u.email = ?";
@@ -157,8 +159,8 @@ public class UsuarioDAO extends MysqlDAO {
 
         String sql =
                 "INSERT INTO usuarios "
-                        + "(nome, email, login, senha, perfil_id) "
-                        + "VALUES (?, ?, ?, ?, ?)";
+                    + "(nome, email, login, senha, perfil_id, ativo) "
+                    + "VALUES (?, ?, ?, ?, ?, TRUE)";
 
         try {
 
@@ -204,15 +206,15 @@ public class UsuarioDAO extends MysqlDAO {
     public void deletar(Long id) {
 
         String sql =
-                "DELETE FROM usuarios "
-                        + "WHERE id = ?";
+            "UPDATE usuarios SET ativo = FALSE "
+                + "WHERE id = ?";
 
         try {
 
             super.executarUpdate(sql, id);
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao deletar.", e);
+            throw new RuntimeException("Erro ao desativar usuario.", e);
         }
     }
 
@@ -227,6 +229,7 @@ public class UsuarioDAO extends MysqlDAO {
         usuario.setLogin(rs.getString("login"));
         usuario.setSenha(rs.getString("senha"));
         usuario.setPerfilId(rs.getLong("perfil_id"));
+        usuario.setAtivo(rs.getBoolean("ativo"));
                 
         Perfil perfil = new Perfil();
 

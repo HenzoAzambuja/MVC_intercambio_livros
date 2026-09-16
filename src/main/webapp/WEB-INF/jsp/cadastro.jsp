@@ -28,7 +28,7 @@
 
 		<c:if test="${not empty erro}">
 			<div class="alert alert-erro">
-				${erro}
+					<c:out value="${erro}" />
 			</div>
 		</c:if>
 
@@ -43,7 +43,7 @@
 				<input type="text"
 					   id="nome"
 					   name="nome"
-					   value="${usuario.nome}"
+					   value="<c:out value='${usuario.nome}' />"
 					   required
 					   autofocus>
 			</div>
@@ -54,7 +54,7 @@
 				<input type="email"
 					   id="email"
 					   name="email"
-					   value="${usuario.email}"
+					   value="<c:out value='${usuario.email}' />"
 					   required>
 			</div>
 
@@ -65,7 +65,7 @@
 				<input type="text"
 					   id="login"
 					   name="login"
-					   value="${usuario.login}"
+					   value="<c:out value='${usuario.login}' />"
 					   required>
 			</div>
 

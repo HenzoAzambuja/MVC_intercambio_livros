@@ -11,7 +11,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1">
 
             <title>
-                Home - Intercambio de Livros
+                Home - BookSwap
             </title>
 
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
@@ -25,7 +25,7 @@
                 <div class="container">
 
                     <strong>
-                        Intercambio de Livros
+                        BookSwap
                     </strong>
 
                     <nav>
@@ -73,7 +73,7 @@
                     <div>
 
                         <h1>
-                            Olá, ${sessionScope.usuarioLogado.nome}!
+                            Olá, <c:out value="${sessionScope.usuarioLogado.nome}" />!
                         </h1>
 
                         <p>
@@ -125,15 +125,15 @@
                                     <div class="menu-card">
 
                                         <h3>
-                                            ${livro.titulo}
+                                            <c:out value="${livro.titulo}" />
                                         </h3>
 
                                         <p>
-                                            ${livro.autor}
+                                            <c:out value="${livro.autor}" />
                                         </p>
 
                                         <span>
-                                            Dono: ${livro.usuario.nome}
+                                            Dono: <c:out value="${livro.usuario.nome}" />
                                         </span>
 
                                     </div>
@@ -195,17 +195,12 @@
                                     <div class="menu-card">
 
                                         <h3>
-                                            ${livro.titulo}
+                                            <c:out value="${livro.titulo}" />
                                         </h3>
 
                                         <p>
-                                            ${livro.autor}
+                                            <c:out value="${livro.autor}" />
                                         </p>
-
-                                        <span>
-                                            Disponível para intercâmbio
-                                        </span>
-
                                     </div>
 
                                 </c:forEach>
@@ -266,21 +261,21 @@
                                     <div class="menu-card">
 
                                         <h3>
-                                            Troca #${troca.id}
+                                            Troca #<c:out value="${troca.id}" />
                                         </h3>
 
                                         <p>
 
-                                            ${troca.livroOferecido.titulo}
+                                            <c:out value="${troca.livroOferecido.titulo}" />
 
                                             ↔
 
-                                            ${troca.livroRecebido.titulo}
+                                            <c:out value="${troca.livroRecebido.titulo}" />
 
                                         </p>
 
                                         <span>
-                                            Status: ${troca.status}
+                                            Status: <c:out value="${troca.status}" />
                                         </span>
 
                                     </div>
@@ -335,7 +330,7 @@
                                     <div class="menu-card">
 
                                         <h3>
-                                            ${usuario.nome}
+                                            <c:out value="${usuario.nome}" />
                                         </h3>
 
                                         <span>

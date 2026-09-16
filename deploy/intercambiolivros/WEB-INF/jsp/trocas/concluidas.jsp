@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Trocas concluidas - Intercambio de Livros
+        Trocas concluidas - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -27,7 +27,7 @@
     <div class="container">
 
         <strong>
-            Intercambio de Livros
+            BookSwap
         </strong>
 
         <nav>
@@ -44,13 +44,14 @@
                 Meus livros
             </a>
 
-            <a href="${pageContext.request.contextPath}/pessoas">
-                Pessoas
-            </a>
 
             <a href="${pageContext.request.contextPath}/trocas">
                 Trocas
             </a>
+
+            <a href="${pageContext.request.contextPath}/pessoas">
+                Pessoas
+            </a>            
 
             <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
                 <a href="${pageContext.request.contextPath}/usuarios">
@@ -118,7 +119,7 @@
                     <div class="menu-card">
 
                         <h3>
-                            Troca #${troca.id}
+                            Troca #<c:out value="${troca.id}" />
                         </h3>
 
                         <p>
@@ -127,7 +128,7 @@
                                 Livro oferecido:
                             </strong>
 
-                            ${troca.livroOferecido.titulo}
+                            <c:out value="${troca.livroOferecido.titulo}" />
 
                         </p>
 
@@ -137,18 +138,18 @@
                                 Livro recebido:
                             </strong>
 
-                            ${troca.livroRecebido.titulo}
+                            <c:out value="${troca.livroRecebido.titulo}" />
 
                         </p>
 
                         <p>
                             <strong>Quem ofereceu:</strong>
-                            ${troca.livroOferecido.usuario.nome}
+                            <c:out value="${troca.livroOferecido.usuario.nome}" />
                         </p>
 
                         <p>
                             <strong>Quem recebeu:</strong>
-                            ${troca.livroRecebido.usuario.nome}
+                            <c:out value="${troca.livroRecebido.usuario.nome}" />
                         </p>
 
                         <p>
@@ -157,7 +158,7 @@
                                 Mensagem:
                             </strong>
 
-                            ${troca.mensagem}
+                            <c:out value="${troca.mensagem}" />
 
                         </p>
 

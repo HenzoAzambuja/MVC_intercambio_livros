@@ -20,7 +20,7 @@
                 Editar livro
             </c:otherwise>
         </c:choose>
-        - Intercambio de Livros
+        - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -35,7 +35,7 @@
     <div class="container">
 
         <strong>
-            Intercambio de Livros
+            BookSwap
         </strong>
 
         <nav>
@@ -103,7 +103,7 @@
         <c:if test="${not empty erro}">
 
             <div class="alert alert-erro">
-                ${erro}
+                <c:out value="${erro}" />
             </div>
 
         </c:if>
@@ -124,7 +124,7 @@
                 <input type="text"
                        id="titulo"
                        name="titulo"
-                       value="${livro.titulo}"
+                         value="<c:out value='${livro.titulo}' />"
                        required>
 
             </div>
@@ -138,7 +138,7 @@
                 <input type="text"
                        id="autor"
                        name="autor"
-                       value="${livro.autor}"
+                         value="<c:out value='${livro.autor}' />"
                        required>
 
             </div>

@@ -25,9 +25,7 @@ public class UsuarioService {
         this.perfilDAO = new PerfilDAO();
     }
 
-    /**
-     * Realiza a autenticacao do usuario.
-     */
+
     public Usuario autenticar(String login, String senha) {
 
         login = this.normalizar(login);
@@ -49,16 +47,10 @@ public class UsuarioService {
         return usuario;
     }
 
-    /**
-     * Lista todos os usuarios.
-     */
     public List<Usuario> listar() {
         return this.usuarioDAO.listarTodos();
     }
 
-    /**
-     * Busca usuario pelo ID.
-     */
     public Usuario buscarPorId(Long id) {
 
         if (id == null) {
@@ -68,12 +60,6 @@ public class UsuarioService {
         return this.usuarioDAO.buscarPorId(id);
     }
 
-    /**
-     * Salva um usuario.
-     *
-     * Sem ID = cadastro.
-     * Com ID = alteracao.
-     */
     public void salvar(Usuario usuario) {
 
         if (usuario == null) {
@@ -105,10 +91,6 @@ public class UsuarioService {
         this.usuarioDAO.alterar(usuario);
     }
 
-    /**
-     * Cadastra um novo usuario com o perfil normal.
-     * O id do usuario fica nulo para o banco gerar o proximo valor.
-     */
     public void cadastrarNormal(Usuario usuario) {
         usuario.setId(null);
         usuario.setPerfilId(PERFIL_NORMAL_ID);
@@ -116,9 +98,7 @@ public class UsuarioService {
         this.salvar(usuario);
     }
 
-    /**
-     * Exclui um usuario.
-     */
+
     public void deletar(Long id) {
 
         if (id == null) {
@@ -134,9 +114,7 @@ public class UsuarioService {
         this.usuarioDAO.deletar(id);
     }
 
-    /**
-     * Remove espacos desnecessarios dos dados.
-     */
+
     private void prepararDados(Usuario usuario) {
 
         usuario.setNome(
@@ -152,9 +130,7 @@ public class UsuarioService {
                 this.normalizar(usuario.getSenha()));
     }
 
-    /**
-     * Valida os campos obrigatorios.
-     */
+
     private void validarCamposObrigatorios(Usuario usuario) {
 
         if (usuario.getNome() == null) {
@@ -183,9 +159,7 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Valida o tamanho minimo da senha.
-     */
+
     private void validarSenha(String senha) {
 
         if (senha.length() < SENHA_MINIMA) {
@@ -197,9 +171,6 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Valida formato basico do email.
-     */
     private void validarEmail(String email) {
 
         if (!email.matches(
@@ -210,9 +181,6 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Verifica se o perfil existe.
-     */
     private void validarPerfilExistente(Long perfilId) {
 
         if (this.perfilDAO.buscarPorId(perfilId) == null) {
@@ -222,9 +190,7 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Verifica se o login ja esta sendo utilizado.
-     */
+
     private void validarLoginUnico(Usuario usuario) {
 
         Usuario existente =
@@ -248,9 +214,6 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Verifica se o email ja esta sendo utilizado.
-     */
     private void validarEmailUnico(Usuario usuario) {
 
         Usuario existente =
@@ -274,9 +237,6 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Normaliza uma String.
-     */
     private String normalizar(String valor) {
 
         if (valor == null) {

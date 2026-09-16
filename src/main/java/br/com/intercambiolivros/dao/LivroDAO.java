@@ -23,6 +23,7 @@ public class LivroDAO extends MysqlDAO {
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.disponivel = TRUE "
+                        + "AND u.ativo = TRUE "
                         + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
                         + "WHERE t.status IN ('PENDENTE', 'ACEITA') "
@@ -56,9 +57,10 @@ public class LivroDAO extends MysqlDAO {
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id <> ? "
                         + "AND l.disponivel = TRUE "
+                        + "AND u.ativo = TRUE "
                         + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
-                        + "WHERE t.status IN ('PENDENTE', 'ACEITA', 'CONCLUIDA') "
+                        + "WHERE t.status IN ('PENDENTE', 'ACEITA') "
                         + "AND ("
                         + "t.livro_oferecido_id = l.id "
                         + "OR t.livro_recebido_id = l.id"
@@ -90,6 +92,7 @@ public class LivroDAO extends MysqlDAO {
                         + "FROM livros l "
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id = ? "
+                        + "AND u.ativo = TRUE "
                         + "ORDER BY l.titulo";
 
         List<Livro> lista = new ArrayList<>();
@@ -118,6 +121,7 @@ public class LivroDAO extends MysqlDAO {
                         + "INNER JOIN usuarios u ON u.id = l.usuario_id "
                         + "WHERE l.usuario_id = ? "
                         + "AND l.disponivel = TRUE "
+                        + "AND u.ativo = TRUE "
                         + "AND NOT EXISTS ("
                         + "SELECT 1 FROM trocas t "
                         + "WHERE t.status IN ('PENDENTE', 'ACEITA') "

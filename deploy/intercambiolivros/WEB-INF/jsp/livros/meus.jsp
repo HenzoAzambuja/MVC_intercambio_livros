@@ -12,7 +12,7 @@
           content="width=device-width, initial-scale=1">
 
     <title>
-        Meus livros - Intercambio de Livros
+        Meus livros - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -27,7 +27,7 @@
     <div class="container">
 
         <strong>
-            Intercambio de Livros
+            BookSwap
         </strong>
 
         <nav>
@@ -37,7 +37,7 @@
             </a>
 
             <a href="${pageContext.request.contextPath}/livros">
-                Livros disponiveis
+                Livros
             </a>
 
             <a href="${pageContext.request.contextPath}/livros?acao=meus">
@@ -88,7 +88,7 @@
     <c:if test="${not empty erro}">
 
         <div class="alert alert-erro">
-            ${erro}
+            <c:out value="${erro}" />
         </div>
 
     </c:if>
@@ -145,11 +145,11 @@
                             </td>
 
                             <td>
-                                ${livro.titulo}
+                                <c:out value="${livro.titulo}" />
                             </td>
 
                             <td>
-                                ${livro.autor}
+                                <c:out value="${livro.autor}" />
                             </td>
 
                             <td>

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Created-By: Apache Maven 3.9.16
-Built-By: Win_10
-Build-Jdk: 17.0.10
+Built-By: henzo
+Build-Jdk: 25.0.4.1
 

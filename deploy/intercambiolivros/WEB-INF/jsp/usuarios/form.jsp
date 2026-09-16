@@ -19,7 +19,7 @@
                 Editar usuario
             </c:otherwise>
         </c:choose>
-        - Intercambio de Livros
+        - BookSwap
     </title>
 
     <link rel="stylesheet"
@@ -33,7 +33,7 @@
 
     <div class="container">
 
-        <strong>Intercambio de Livros</strong>
+        <strong>BookSwap</strong>
 
         <nav>
 
@@ -86,7 +86,7 @@
         <c:if test="${not empty erro}">
 
             <div class="alert alert-erro">
-                ${erro}
+                <c:out value="${erro}" />
             </div>
 
         </c:if>
@@ -112,7 +112,7 @@
                 <input type="text"
                        id="nome"
                        name="nome"
-                       value="${usuario.nome}"
+                       value="<c:out value='${usuario.nome}' />"
                        required>
 
             </div>
@@ -127,7 +127,7 @@
                 <input type="email"
                        id="email"
                        name="email"
-                       value="${usuario.email}"
+                       value="<c:out value='${usuario.email}' />"
                        required>
 
             </div>
@@ -142,7 +142,7 @@
                 <input type="text"
                        id="login"
                        name="login"
-                       value="${usuario.login}"
+                       value="<c:out value='${usuario.login}' />"
                        required>
 
             </div>
@@ -157,7 +157,7 @@
                 <input type="password"
                        id="senha"
                        name="senha"
-                       value="${usuario.senha}"
+                       value="<c:out value='${usuario.senha}' />"
                        required>
 
             </div>
@@ -184,7 +184,7 @@
                                 selected
                             </c:if>>
 
-                            ${perfil.nome}
+                            <c:out value="${perfil.nome}" />
 
                         </option>
 

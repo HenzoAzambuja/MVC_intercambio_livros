@@ -28,6 +28,7 @@ CREATE TABLE usuarios (
     login VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL,
     perfil_id BIGINT NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
 
     PRIMARY KEY (id),
 
@@ -52,7 +53,7 @@ CREATE TABLE livros (
     titulo VARCHAR(150) NOT NULL,
     autor VARCHAR(100) NOT NULL,
     usuario_id BIGINT NOT NULL,
-    disponivel BOOLEAN NOT NULL DEFAULT FALSE,
+    disponivel BOOLEAN NOT NULL DEFAULT TRUE,
 
     PRIMARY KEY (id),
 

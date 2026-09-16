@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Pessoas - Intercambio de Livros</title>
+    <title>Pessoas - BookSwap</title>
 
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/estilo.css">
@@ -18,7 +18,7 @@
 
 <header class="topbar">
     <div class="container">
-        <strong>Intercambio de Livros</strong>
+        <strong>BookSwap</strong>
 
         <nav>
             <a href="${pageContext.request.contextPath}/home">Home</a>
@@ -40,7 +40,7 @@
         <c:when test="${not empty usuarioPerfil}">
             <div class="page-header">
                 <div>
-                    <h1>${usuarioPerfil.nome}</h1>
+                    <h1><c:out value="${usuarioPerfil.nome}" /></h1>
                     <p>Veja os livros disponíveis para intercâmbio.</p>
                 </div>
 
@@ -50,7 +50,7 @@
             </div>
 
             <section class="home-section">
-                <h2>Livros de ${usuarioPerfil.nome}</h2>
+                <h2>Livros de <c:out value="${usuarioPerfil.nome}" /></h2>
 
                 <c:choose>
                     <c:when test="${empty livrosPessoa}">
@@ -62,9 +62,8 @@
                         <div class="grid-cards">
                             <c:forEach var="livro" items="${livrosPessoa}">
                                 <div class="menu-card">
-                                    <h3>${livro.titulo}</h3>
-                                    <p>${livro.autor}</p>
-                                    <span>Disponível para intercâmbio</span>
+                                    <h3><c:out value="${livro.titulo}" /></h3>
+                                    <p><c:out value="${livro.autor}" /></p>
                                 </div>
                             </c:forEach>
                         </div>
@@ -91,7 +90,7 @@
                     <div class="grid-cards">
                         <c:forEach var="usuario" items="${usuarios}">
                             <div class="menu-card">
-                                <h3>${usuario.nome}</h3>
+                                <h3><c:out value="${usuario.nome}" /></h3>
                                 <p>Veja os livros disponíveis desta pessoa.</p>
                                 <a href="${pageContext.request.contextPath}/pessoas?id=${usuario.id}">
                                     Ver perfil →

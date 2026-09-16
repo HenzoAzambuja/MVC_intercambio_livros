@@ -57,42 +57,4 @@ public class MysqlSingleton {
         }
     }
 
-    public void concluirTroca(Long trocaId, Long livroOferecidoId,
-                              Long livroRecebidoId, Long usuarioOferecedor,
-                              Long usuarioRecebedor) throws SQLException {
-        Connection conn = this.obterConexao();
-        boolean autoCommit = conn.getAutoCommit();
-
-        try {
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement troca = conn.prepareStatement(
-                    "UPDATE trocas SET status = 'CONCLUIDA' "
-                            + "WHERE id = ? AND status = 'ACEITA'")) {
-                troca.setLong(1, trocaId);
-                troca.executeUpdate();
-            }
-
-            try (PreparedStatement livros = conn.prepareStatement(
-                    "UPDATE livros SET usuario_id = CASE id "
-                            + "WHEN ? THEN ? WHEN ? THEN ? END, "
-                            + "disponivel = FALSE "
-                            + "WHERE id IN (?, ?)")) {
-                livros.setLong(1, livroOferecidoId);
-                livros.setLong(2, usuarioRecebedor);
-                livros.setLong(3, livroRecebidoId);
-                livros.setLong(4, usuarioOferecedor);
-                livros.setLong(5, livroOferecidoId);
-                livros.setLong(6, livroRecebidoId);
-                livros.executeUpdate();
-            }
-
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(autoCommit);
-        }
-    }
 }
