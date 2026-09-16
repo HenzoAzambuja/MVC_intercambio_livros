@@ -35,6 +35,12 @@ public class AuthFilter implements Filter {
             return;
         }
 
+        if (req.getRequestURI().substring(req.getContextPath().length()).startsWith("/usuarios")
+                && !Long.valueOf(1L).equals(usuarioLogado.getPerfilId())) {
+            resp.sendRedirect(req.getContextPath() + "/home");
+            return;
+        }
+
         chain.doFilter(request, response);
     }
 }

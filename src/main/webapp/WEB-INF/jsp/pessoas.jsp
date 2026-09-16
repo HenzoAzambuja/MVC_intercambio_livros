@@ -24,7 +24,11 @@
             <a href="${pageContext.request.contextPath}/home">Home</a>
             <a href="${pageContext.request.contextPath}/livros">Livros</a>
             <a href="${pageContext.request.contextPath}/livros?acao=meus">Meus livros</a>
+            <a href="${pageContext.request.contextPath}/trocas">Trocas</a>
             <a href="${pageContext.request.contextPath}/pessoas">Pessoas</a>
+            <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
+                <a href="${pageContext.request.contextPath}/usuarios">Usuarios</a>
+            </c:if>
             <a href="${pageContext.request.contextPath}/logout">Sair</a>
         </nav>
     </div>

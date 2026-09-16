@@ -52,6 +52,12 @@
                 Trocas
             </a>
 
+            <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
+                <a href="${pageContext.request.contextPath}/usuarios">
+                    Usuarios
+                </a>
+            </c:if>
+
             <a href="${pageContext.request.contextPath}/logout">
                 Sair
             </a>

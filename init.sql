@@ -125,14 +125,14 @@ VALUES
         'alexandre@intercambiolivros.com',
         'alexandre',
         '123456',
-        3
+        2
     ),
     (
         'Dilma Rousseff',
         'dilma@intercambiolivros.com',
         'dilma',
         '123456',
-        4
+        2
     );
     
 
