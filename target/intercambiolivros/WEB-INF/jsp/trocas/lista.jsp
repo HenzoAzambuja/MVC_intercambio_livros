@@ -159,24 +159,14 @@
 
                         </p>
 
-                        <!-- <p>
-
-                            <strong>
-                                Usuario:
-                            </strong>
-
-                            <c:out value="${troca.livroRecebido.usuario.nome}" />
-
-                        </p> -->
-
                         <p>
-                            <strong>Quem oferece:</strong>
-                            <c:out value="${troca.livroOferecido.usuario.nome}" />
+                            <strong>Usuário que oferece:</strong>
+                            #<c:out value="${troca.livroOferecido.usuarioId}" />
                         </p>
 
                         <p>
-                            <strong>Quem recebe:</strong>
-                            <c:out value="${troca.livroRecebido.usuario.nome}" />
+                            <strong>Usuário que recebe:</strong>
+                            #<c:out value="${troca.livroRecebido.usuarioId}" />
                         </p>
 
                         <p>

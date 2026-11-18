@@ -21,12 +21,13 @@ public class UsuarioServlet extends BaseServlet {
     private static final String LISTA = "/WEB-INF/jsp/usuarios/lista.jsp";
     private static final String FORM = "/WEB-INF/jsp/usuarios/form.jsp";
 
-    private final UsuarioService usuarioService = new UsuarioService();
     private final PerfilService perfilService = new PerfilService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        UsuarioService usuarioService =
+                new UsuarioService(this.apiToken(req));
 
         switch (this.acao(req)) {
 
@@ -35,7 +36,7 @@ public class UsuarioServlet extends BaseServlet {
                 break;
 
             case "editar":
-                Usuario usuario = this.usuarioService.buscarPorId(
+                Usuario usuario = usuarioService.buscarPorId(
                         this.paramLong(req, "id"));
 
                 this.form(req, resp, usuario);
@@ -43,7 +44,7 @@ public class UsuarioServlet extends BaseServlet {
 
             case "excluir":
                 try {
-                    this.usuarioService.deletar(
+                    usuarioService.deletar(
                             this.paramLong(req, "id"));
 
                     this.redirect(req, resp, "/usuarios");
@@ -52,7 +53,7 @@ public class UsuarioServlet extends BaseServlet {
 
                     req.setAttribute("erro", e.getMessage());
                     req.setAttribute("usuarios",
-                            this.usuarioService.listar());
+                            usuarioService.listar());
 
                     this.forward(req, resp, LISTA);
                 }
@@ -60,7 +61,7 @@ public class UsuarioServlet extends BaseServlet {
 
             default:
                 req.setAttribute("usuarios",
-                        this.usuarioService.listar());
+                        usuarioService.listar());
 
                 this.forward(req, resp, LISTA);
                 break;
@@ -72,11 +73,13 @@ public class UsuarioServlet extends BaseServlet {
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
+        UsuarioService usuarioService =
+                new UsuarioService(this.apiToken(req));
 
         Usuario usuario = this.fromRequest(req);
 
         try {
-            this.usuarioService.salvar(usuario);
+            usuarioService.salvar(usuario);
 
             this.redirect(req, resp, "/usuarios");
 
@@ -95,6 +98,11 @@ public class UsuarioServlet extends BaseServlet {
         if ("editar".equals(this.acao(req)) && usuario == null) {
             this.redirect(req, resp, "/usuarios");
             return;
+        }
+
+        if (usuario == null) {
+            usuario = new Usuario();
+            usuario.setPerfilId(2L);
         }
 
         req.setAttribute("usuario", usuario);

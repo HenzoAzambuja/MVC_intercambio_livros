@@ -1,8 +1,8 @@
 package br.com.intercambiolivros.controller;
 
 import br.com.intercambiolivros.model.Usuario;
+import br.com.intercambiolivros.model.Livro;
 import br.com.intercambiolivros.service.LivroService;
-import br.com.intercambiolivros.service.UsuarioService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,17 +17,24 @@ public class PessoasServlet extends BaseServlet {
 
     private static final String VIEW = "/WEB-INF/jsp/pessoas.jsp";
 
-    private final UsuarioService usuarioService = new UsuarioService();
-    private final LivroService livroService = new LivroService();
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = this.usuarioLogado(req);
+        if (usuarioLogado == null) {
+            this.redirect(req, resp, "/login");
+            return;
+        }
+        LivroService livroService = new LivroService(this.apiToken(req));
         Long id = this.paramLong(req, "id");
 
         if (id != null) {
-            Usuario usuario = this.usuarioService.buscarPorId(id);
+            List<Livro> livros = livroService.listar();
+            List<Usuario> donos = pessoasComLivros(livros);
+            Usuario usuario = donos.stream()
+                    .filter(pessoa -> pessoa.getId().equals(id))
+                    .findFirst()
+                    .orElse(null);
 
             if (usuario == null) {
                 this.redirect(req, resp, "/pessoas");
@@ -35,9 +42,11 @@ public class PessoasServlet extends BaseServlet {
             }
 
             req.setAttribute("usuarioPerfil", usuario);
-            req.setAttribute("livrosPessoa",this.livroService.listarDisponiveisPorUsuario(id));
+            req.setAttribute("livrosPessoa", livros.stream()
+                    .filter(livro -> id.equals(livro.getUsuarioId()))
+                    .toList());
         } else {
-            List<Usuario> usuarios = this.usuarioService.listar().stream()
+            List<Usuario> usuarios = pessoasComLivros(livroService.listar()).stream()
                     .filter(usuario -> !usuario.getId().equals(usuarioLogado.getId()))
                     .toList();
 
@@ -63,4 +72,19 @@ public class PessoasServlet extends BaseServlet {
 
     return null;
 }
+
+    private List<Usuario> pessoasComLivros(
+            List<Livro> livros) {
+        return livros.stream()
+                .map(Livro::getUsuario)
+                .filter(usuario -> usuario != null && usuario.getId() != null)
+                .collect(java.util.stream.Collectors.toMap(
+                        Usuario::getId,
+                        usuario -> usuario,
+                        (atual, ignorado) -> atual,
+                        java.util.LinkedHashMap::new))
+                .values()
+                .stream()
+                .toList();
+    }
 }

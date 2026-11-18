@@ -1,6 +1,6 @@
 # 📚 BookSwap - Sistema de Intercâmbio de Livros
 
-Trata-se de uma aplicação web completa desenvolvida em **Java** utilizando a arquitetura **MVC (Model-View-Controller)**, com camadas adicionais de **DAO (Data Access Object)** e **Service**, persistência em banco de dados **MySQL** e execução conteinerizada via **Docker**.
+Trata-se de uma aplicação web desenvolvida em **Java** utilizando a arquitetura **MVC (Model-View-Controller)**, com camadas **DAO** e **Service**. O SAAS comunica-se com o backend exclusivamente pela API REST; não abre conexões diretas ao MySQL.
 
 ---
 
@@ -16,7 +16,7 @@ Trata-se de uma aplicação web completa desenvolvida em **Java** utilizando a a
 - **Linguagem:** Java
 - **Plataforma Web:** Jakarta EE 10 (Jakarta Servlet 6.0 & Jakarta JSTL 3.0)
 - **Servidor de Aplicação:** Apache Tomcat 10.1
-- **Banco de Dados:** MySQL 8.4
+- **API:** API REST do BookSwap, com autenticação JWT
 - **Gerenciador de Dependências e Build:** Apache Maven
 - **Conteinerização:** Docker & Docker Compose
 - **Front-end:** JSP (JavaServer Pages), JSTL, HTML5, CSS3 responsivo e JavaScript
@@ -30,9 +30,9 @@ A aplicação adota separação rigorosa de responsabilidades:
 ```
 src/main/
 ├── java/br/com/intercambiolivros/
-│   ├── config/          # Configuração e Singleton de Conexão JDBC (MysqlSingleton)
+│   ├── config/          # Cliente HTTP da API e Singleton (ApiSingleton)
 │   ├── controller/      # Servlets / Controllers (BaseServlet, LivroServlet, etc.)
-│   ├── dao/             # Camada de Acesso a Dados com PreparedStatement (LivroDAO, etc.)
+│   ├── dao/             # Chamadas REST e conversão JSON (LivroDAO, etc.)
 │   ├── filter/          # Filtro de Autenticação e Controle de Acesso (AuthFilter)
 │   ├── model/           # Modelos de Domínio / JavaBeans (Livro, Usuario, Troca, Perfil)
 │   └── service/         # Camada de Negócio e Validações (LivroService, etc.)
@@ -50,9 +50,9 @@ src/main/
   - **Model:** Classes em `br.com.intercambiolivros.model`.
   - **View:** JSPs localizados dentro de `WEB-INF/jsp/` (garantindo que o cliente nunca acesse as páginas diretamente sem passar por um Controller).
   - **Controller:** Servlets mapeados com `@WebServlet` herdando de `BaseServlet` para tratamento padronizado de parâmetros, redirecionamentos e encaminhamentos.
-- **DAO (Data Access Object):** Centraliza comandos SQL em classes filhas de `MysqlDAO`, utilizando sempre `PreparedStatement` para prevenir ataques de *SQL Injection*.
-- **Service:** Isola regras de negócio, validações de formulário, cálculos e integridade (ex: validação de e-mail por regex, tamanho de senha, unicidade de dados e regras para troca de livros).
-- **Singleton:** `MysqlSingleton` gerencia uma conexão reutilizável com o banco de dados.
+- **DAO (Data Access Object):** Centraliza requisições REST e converte as respostas JSON para os modelos.
+- **Service:** Organiza as chamadas dos DAOs e valida campos básicos; propriedade, disponibilidade e regras de troca são validadas pela API.
+- **Singleton:** `ApiSingleton` centraliza URL-base, cliente HTTP, cabeçalhos, JWT e respostas JSON.
 - **Front Controller / Filter:** `AuthFilter` intercepta requisições privadas, garantindo sessão autenticada e autorização por perfil (ex: tela de usuários restrita a Administradores).
 
 ---
@@ -83,11 +83,13 @@ src/main/
 ### 5. Catálogo de Pessoas
 - Visualização de outros usuários da comunidade e consulta direta dos livros que cada pessoa possui disponíveis para troca.
 
+Como a API atual não oferece uma rota pública para listar usuários, as telas de pessoas exibem os proprietários dos livros disponíveis retornados pela API. A criação de contas pela API pública permite apenas o perfil Cliente.
+
 ---
 
 ## 🔑 Credenciais para Teste
 
-O script de inicialização do banco (`init.sql`) já popula usuários de teste:
+O backend da API popula usuários de teste pelo script `init.sql`:
 
 | Tipo de Usuário | Login | Senha | Acesso Especial |
 | :--- | :--- | :--- | :--- |
@@ -102,24 +104,29 @@ O script de inicialização do banco (`init.sql`) já popula usuários de teste:
 
 ### Via Docker Compose 
 
-Certifique-se de ter o **Docker** e o **Docker Compose** instalados na sua máquina.
+Certifique-se de ter o **Docker**, o **Docker Compose** e o **Maven** instalados na sua máquina.
 
-1. No terminal, na raiz do projeto, execute:
+1. Gere o WAR atualizado:
+   ```bash
+   mvn clean package
+   ```
+
+2. Inicie o backend da API e seu banco de dados separadamente. A configuração padrão existente da API publica a porta `8080`.
+3. Configure `API_BASE_URL` se a API estiver em outro endereço. O padrão do `docker-compose.yml` é `http://host.docker.internal:8080/intercambiolivros/api`.
+4. No terminal, na raiz do projeto, execute:
    ```bash
    docker compose up -d
    ```
    *(ou `docker-compose up -d`)*
 
-2. O Docker iniciará:
-   - Container do **MySQL 8.4** executando automaticamente o script `init.sql`.
-   - Container do **Apache Tomcat 10.1** implantando a aplicação contida na pasta `deploy`.
+5. O Docker iniciará o **Apache Tomcat 10.1**, implantando o WAR atualizado de `deploy`.
 
-3. Abra o navegador e acesse:
+6. Abra o navegador e acesse:
    ```text
-   http://localhost:8080/intercambiolivros
+   http://localhost:8081/intercambiolivros
    ```
 
-4. Para parar os containers:
+7. Para parar o container do SAAS:
    ```bash
    docker compose down
    ```

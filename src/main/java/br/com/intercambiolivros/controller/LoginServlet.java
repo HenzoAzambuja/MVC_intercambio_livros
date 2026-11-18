@@ -28,7 +28,9 @@ public class LoginServlet extends BaseServlet {
             throws ServletException, IOException {
 
         HttpSession session = req.getSession(false);
-        if (session != null && session.getAttribute("usuarioLogado") != null) {
+        if (session != null
+                && session.getAttribute("usuarioLogado") != null
+                && session.getAttribute("apiToken") != null) {
             this.redirect(req, resp, "/home");
             return;
         }
@@ -47,7 +49,10 @@ public class LoginServlet extends BaseServlet {
                     this.param(req, "login"),
                     this.param(req, "senha"));
 
-            req.getSession(true).setAttribute("usuarioLogado", usuario);
+            HttpSession session = req.getSession(true);
+            session.setAttribute("apiToken", usuario.getApiToken());
+            usuario.setApiToken(null);
+            session.setAttribute("usuarioLogado", usuario);
             this.redirect(req, resp, "/home");
         } catch (IllegalArgumentException e) {
             req.setAttribute("erro", e.getMessage());

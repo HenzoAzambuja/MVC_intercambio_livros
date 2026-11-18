@@ -23,9 +23,6 @@ public class LivroServlet extends BaseServlet {
     private static final String FORM =
             "/WEB-INF/jsp/livros/form.jsp";
 
-    private final LivroService livroService =
-            new LivroService();
-
     @Override
     protected void doGet(
             HttpServletRequest req,
@@ -34,6 +31,8 @@ public class LivroServlet extends BaseServlet {
 
         Usuario usuarioLogado =
                 this.usuarioLogado(req);
+        LivroService livroService =
+                new LivroService(this.apiToken(req));
 
         if (usuarioLogado == null) {
             this.redirect(req, resp, "/login");
@@ -48,7 +47,7 @@ public class LivroServlet extends BaseServlet {
             case "editar" -> {
 
                 Livro livro =
-                        this.livroService.buscarPorId(
+                        livroService.buscarPorId(
                                 this.paramLong(req, "id"));
 
                 if (livro == null
@@ -61,7 +60,7 @@ public class LivroServlet extends BaseServlet {
 
                     req.setAttribute(
                             "livros",
-                            this.livroService.listarPorUsuario(
+                            livroService.listarPorUsuario(
                                     usuarioLogado.getId()));
 
                     this.forward(req, resp, MEUS);
@@ -75,7 +74,7 @@ public class LivroServlet extends BaseServlet {
 
                 try {
 
-                    this.livroService.deletar(
+                    livroService.deletar(
                             this.paramLong(req, "id"),
                             usuarioLogado.getId());
 
@@ -92,7 +91,7 @@ public class LivroServlet extends BaseServlet {
 
                     req.setAttribute(
                             "livros",
-                            this.livroService.listarPorUsuario(
+                            livroService.listarPorUsuario(
                                     usuarioLogado.getId()));
 
                     this.forward(
@@ -105,14 +104,14 @@ public class LivroServlet extends BaseServlet {
                         case "disponibilidade" -> {
 
                                 try {
-                                        this.livroService.alterarDisponibilidade(
+                                        livroService.alterarDisponibilidade(
                                                         this.paramLong(req, "id"),
                                                         usuarioLogado.getId());
 
                                         this.redirect(req, resp, "/livros?acao=meus");
                                 } catch (IllegalArgumentException e) {
                                         req.setAttribute("erro", e.getMessage());
-                                        req.setAttribute("livros", this.livroService.listarPorUsuario(
+                                        req.setAttribute("livros", livroService.listarPorUsuario(
                                                         usuarioLogado.getId()));
                                         this.forward(req, resp, MEUS);
                                 }
@@ -122,7 +121,7 @@ public class LivroServlet extends BaseServlet {
 
                 req.setAttribute(
                         "livros",
-                        this.livroService.listarPorUsuario(
+                        livroService.listarPorUsuario(
                                 usuarioLogado.getId()));
 
                 this.forward(req, resp, MEUS);
@@ -132,7 +131,7 @@ public class LivroServlet extends BaseServlet {
 
                 req.setAttribute(
                         "livros",
-                        this.livroService.listarDisponiveis(
+                        livroService.listarDisponiveis(
                                 usuarioLogado.getId()));
 
                 this.forward(req, resp, LISTA);
@@ -150,6 +149,8 @@ public class LivroServlet extends BaseServlet {
 
         Usuario usuarioLogado =
                 this.usuarioLogado(req);
+        LivroService livroService =
+                new LivroService(this.apiToken(req));
 
         if (usuarioLogado == null) {
             this.redirect(req, resp, "/login");
@@ -160,7 +161,7 @@ public class LivroServlet extends BaseServlet {
 
         try {
 
-            this.livroService.salvar(
+            livroService.salvar(
                     livro,
                     usuarioLogado.getId());
 

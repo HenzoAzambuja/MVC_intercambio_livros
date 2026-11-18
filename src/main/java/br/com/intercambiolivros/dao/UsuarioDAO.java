@@ -1,243 +1,102 @@
 package br.com.intercambiolivros.dao;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import br.com.intercambiolivros.model.Usuario;
+import br.com.intercambiolivros.config.ApiSingleton;
+import br.com.intercambiolivros.config.ApiException;
 import br.com.intercambiolivros.model.Perfil;
+import br.com.intercambiolivros.model.Usuario;
 
-/**
- * DAO de Usuario.
- *
- * Responsavel pelo acesso ao banco de dados.
- */
-public class UsuarioDAO extends MysqlDAO {
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
-    public UsuarioDAO() {
-        super();
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+public class UsuarioDAO {
+
+    private static final Type USUARIO_LIST_TYPE =
+            TypeToken.getParameterized(List.class, Usuario.class).getType();
+
+    private final ApiSingleton api = ApiSingleton.getInstance();
+    private final String token;
+
+    public UsuarioDAO(String token) {
+        this.token = token;
     }
 
     public Usuario buscarPorLoginESenha(String login, String senha) {
+        JsonObject response = this.api.post(
+                "/auth/login",
+                null,
+                Map.of("login", login, "senha", senha),
+                JsonObject.class);
 
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.login = ? AND u.senha = ? "
-                    + "AND u.ativo = TRUE";
-
-        try (ResultSet rs = super.executar(sql, login, senha)) {
-
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar usuario.", e);
-        }
-
-        return null;
+        Usuario usuario = new Usuario();
+        usuario.setId(response.get("usuarioId").getAsLong());
+        usuario.setNome(response.get("nome").getAsString());
+        usuario.setPerfilId(response.get("perfilId").getAsLong());
+        usuario.setAtivo(true);
+        usuario.setPerfil(perfil(usuario.getPerfilId()));
+        usuario.setApiToken(response.get("token").getAsString());
+        return usuario;
     }
 
     public List<Usuario> listarTodos() {
-
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.ativo = TRUE "
-                        + "ORDER BY u.nome";
-
-        List<Usuario> lista = new ArrayList<>();
-
-        try (ResultSet rs = super.executar(sql)) {
-
-            while (rs.next()) {
-                lista.add(this.mapearComPerfil(rs));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar usuarios.", e);
-        }
-
-        return lista;
+        List<Usuario> usuarios =
+                this.api.get("/usuarios", this.token, USUARIO_LIST_TYPE);
+        usuarios.forEach(usuario -> usuario.setPerfil(perfil(usuario.getPerfilId())));
+        return usuarios;
     }
 
     public Usuario buscarPorId(Long id) {
-
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                        + "WHERE u.id = ?";
-
-        try (ResultSet rs = super.executar(sql, id)) {
-
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
+        if (id == null) {
+            return null;
+        }
+        try {
+            Usuario usuario = this.api.get(
+                    "/usuarios/" + id,
+                    this.token,
+                    Usuario.class);
+            usuario.setPerfil(perfil(usuario.getPerfilId()));
+            return usuario;
+        } catch (ApiException e) {
+            if (e.getStatusCode() == 404) {
+                return null;
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar por id.", e);
+            throw e;
         }
-
-        return null;
-    }
-
-    public Usuario buscarPorLogin(String login) {
-
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                        + "WHERE u.login = ?";
-
-        try (ResultSet rs = super.executar(sql, login)) {
-
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar por login.", e);
-        }
-
-        return null;
-    }
-
-    public Usuario buscarPorEmail(String email) {
-
-        String sql =
-            "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                    + "FROM usuarios u "
-                    + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.email = ?";
-
-    try (ResultSet rs = super.executar(sql, email)) {
-
-        if (rs.next()) {
-            return this.mapearComPerfil(rs);
-        }
-
-    } catch (SQLException e) {
-        throw new RuntimeException(
-                "Erro ao buscar por email.", e);
-    }
-
-    return null;
-}
-
-    public int contarPorPerfil(Long perfilId) {
-
-        String sql =
-                "SELECT COUNT(*) AS total "
-                        + "FROM usuarios "
-                        + "WHERE perfil_id = ?";
-
-        try (ResultSet rs = super.executar(sql, perfilId)) {
-
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao contar usuarios por perfil.", e);
-        }
-
-        return 0;
     }
 
     public void inserir(Usuario usuario) {
-
-        String sql =
-                "INSERT INTO usuarios "
-                    + "(nome, email, login, senha, perfil_id, ativo) "
-                    + "VALUES (?, ?, ?, ?, ?, TRUE)";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getLogin(),
-                    usuario.getSenha(),
-                    usuario.getPerfilId()
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir.", e);
+        if (!Long.valueOf(2L).equals(usuario.getPerfilId())) {
+            throw new IllegalArgumentException(
+                    "A API atual permite cadastrar somente usuarios Cliente.");
         }
+        this.api.post("/usuarios/cadastro", this.token, usuario, Void.class);
     }
 
     public void alterar(Usuario usuario) {
-
-        String sql =
-                "UPDATE usuarios "
-                        + "SET nome = ?, email = ?, login = ?, "
-                        + "senha = ?, perfil_id = ? "
-                        + "WHERE id = ?";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getLogin(),
-                    usuario.getSenha(),
-                    usuario.getPerfilId(),
-                    usuario.getId()
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao alterar.", e);
-        }
+        this.api.put(
+                "/usuarios/" + usuario.getId(),
+                this.token,
+                usuario,
+                Void.class);
     }
 
     public void deletar(Long id) {
+        this.api.delete("/usuarios/" + id, this.token, Void.class);
+    }
 
-        String sql =
-            "UPDATE usuarios SET ativo = FALSE "
-                + "WHERE id = ?";
-
-        try {
-
-            super.executarUpdate(sql, id);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao desativar usuario.", e);
+    private static Perfil perfil(Long perfilId) {
+        if (perfilId == null) {
+            return null;
         }
-    }
-
-    private Usuario mapearComPerfil(ResultSet rs)
-            throws SQLException {
-
-        Usuario usuario = new Usuario();
-
-        usuario.setId(rs.getLong("id"));
-        usuario.setNome(rs.getString("nome"));
-        usuario.setEmail(rs.getString("email"));
-        usuario.setLogin(rs.getString("login"));
-        usuario.setSenha(rs.getString("senha"));
-        usuario.setPerfilId(rs.getLong("perfil_id"));
-        usuario.setAtivo(rs.getBoolean("ativo"));
-                
         Perfil perfil = new Perfil();
-
-        perfil.setId(rs.getLong("perfil_id"));
-        perfil.setNome(rs.getString("perfil_nome"));
-
-        usuario.setPerfil(perfil);
-
-        return usuario;
+        perfil.setId(perfilId);
+        perfil.setNome(Long.valueOf(1L).equals(perfilId)
+                ? "Administrador"
+                : "Cliente");
+        return perfil;
     }
+
 }

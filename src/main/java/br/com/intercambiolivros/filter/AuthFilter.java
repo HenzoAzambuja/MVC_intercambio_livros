@@ -25,12 +25,16 @@ public class AuthFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        Usuario usuarioLogado = null;
-        if (session != null) {
-            usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
-        }
+        Object usuario = session == null
+                ? null
+                : session.getAttribute("usuarioLogado");
+        Object token = session == null
+                ? null
+                : session.getAttribute("apiToken");
 
-        if (usuarioLogado == null) {
+        if (!(usuario instanceof Usuario usuarioLogado)
+                || !(token instanceof String apiToken)
+                || apiToken.isBlank()) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }

@@ -5,7 +5,6 @@ import br.com.intercambiolivros.model.Troca;
 import br.com.intercambiolivros.model.Usuario;
 import br.com.intercambiolivros.service.LivroService;
 import br.com.intercambiolivros.service.TrocaService;
-import br.com.intercambiolivros.service.UsuarioService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,15 +21,6 @@ public class HomeServlet extends BaseServlet {
     private static final String VIEW =
             "/WEB-INF/jsp/home.jsp";
 
-    private final LivroService livroService =
-            new LivroService();
-
-    private final UsuarioService usuarioService =
-            new UsuarioService();
-
-    private final TrocaService trocaService =
-            new TrocaService();
-
     @Override
     protected void doGet(
             HttpServletRequest req,
@@ -39,26 +29,24 @@ public class HomeServlet extends BaseServlet {
 
         Usuario usuarioLogado =
                 this.usuarioLogado(req);
+        String token = this.apiToken(req);
 
         if (usuarioLogado == null) {
             this.redirect(req, resp, "/login");
             return;
         }
 
+        LivroService livroService = new LivroService(token);
         List<Livro> livrosDisponiveis =
-                this.livroService.listarDisponiveis(
-                        usuarioLogado.getId());
+                livroService.listarDisponiveis(usuarioLogado.getId());
 
         List<Livro> meusLivros =
-                this.livroService.listarPorUsuario(
-                        usuarioLogado.getId());
-
-        List<Usuario> usuarios =
-                this.usuarioService.listar();
+                livroService.listarPorUsuario(usuarioLogado.getId());
 
         List<Troca> trocas =
-                this.trocaService.listarPorUsuario(
-                        usuarioLogado.getId());
+                new TrocaService(token).listarPorUsuario(usuarioLogado.getId());
+
+        List<Usuario> usuarios = pessoasComLivros(livrosDisponiveis);
 
         req.setAttribute(
                 "livrosDisponiveis",
@@ -144,6 +132,20 @@ public class HomeServlet extends BaseServlet {
                         !usuario.getId()
                                 .equals(usuarioLogadoId))
                 .limit(quantidade)
+                .toList();
+    }
+
+    private List<Usuario> pessoasComLivros(List<Livro> livros) {
+        return livros.stream()
+                .map(Livro::getUsuario)
+                .filter(usuario -> usuario != null && usuario.getId() != null)
+                .collect(java.util.stream.Collectors.toMap(
+                        Usuario::getId,
+                        usuario -> usuario,
+                        (atual, ignorado) -> atual,
+                        java.util.LinkedHashMap::new))
+                .values()
+                .stream()
                 .toList();
     }
 }

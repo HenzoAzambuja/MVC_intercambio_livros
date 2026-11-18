@@ -35,9 +35,6 @@
                 Usuarios
             </a>
 
-            <a href="${pageContext.request.contextPath}/perfis">
-                Perfis
-            </a>
 
             <a href="${pageContext.request.contextPath}/logout">
                 Sair

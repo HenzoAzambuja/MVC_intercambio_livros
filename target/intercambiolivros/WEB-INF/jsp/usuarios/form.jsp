@@ -45,10 +45,6 @@
                 Usuarios
             </a>
 
-            <a href="${pageContext.request.contextPath}/perfis">
-                Perfis
-            </a>
-
             <a href="${pageContext.request.contextPath}/logout">
                 Sair
             </a>
@@ -151,13 +147,12 @@
             <div class="form-group">
 
                 <label for="senha">
-                    Senha
+                    Senha (informe uma nova senha ao editar)
                 </label>
 
                 <input type="password"
                        id="senha"
                        name="senha"
-                       value="<c:out value='${usuario.senha}' />"
                        required>
 
             </div>

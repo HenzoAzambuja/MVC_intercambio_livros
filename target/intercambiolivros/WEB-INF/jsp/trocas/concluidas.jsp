@@ -144,12 +144,12 @@
 
                         <p>
                             <strong>Quem ofereceu:</strong>
-                            <c:out value="${troca.livroOferecido.usuario.nome}" />
+                            #<c:out value="${troca.livroOferecido.usuarioId}" />
                         </p>
 
                         <p>
                             <strong>Quem recebeu:</strong>
-                            <c:out value="${troca.livroRecebido.usuario.nome}" />
+                            #<c:out value="${troca.livroRecebido.usuarioId}" />
                         </p>
 
                         <p>

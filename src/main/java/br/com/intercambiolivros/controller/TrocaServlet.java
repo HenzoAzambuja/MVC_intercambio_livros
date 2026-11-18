@@ -23,12 +23,6 @@ public class TrocaServlet extends BaseServlet {
     private static final String FORM =
             "/WEB-INF/jsp/trocas/form.jsp";
 
-    private final TrocaService trocaService =
-            new TrocaService();
-
-    private final LivroService livroService =
-            new LivroService();
-
     @Override
     protected void doGet(
             HttpServletRequest req,
@@ -101,7 +95,7 @@ public class TrocaServlet extends BaseServlet {
 
         try {
 
-            this.trocaService.solicitar(
+            new TrocaService(this.apiToken(req)).solicitar(
                     usuarioLogado.getId(),
                     this.paramLong(
                             req,
@@ -138,8 +132,8 @@ public class TrocaServlet extends BaseServlet {
             throws ServletException, IOException {
 
         List<Troca> trocas =
-                this.trocaService.listarPorUsuario(
-                        usuarioId);
+                new TrocaService(this.apiToken(req))
+                        .listarPorUsuario(usuarioId);
 
         req.setAttribute(
                 "trocas",
@@ -157,13 +151,13 @@ public class TrocaServlet extends BaseServlet {
             Long usuarioId)
             throws ServletException, IOException {
 
+        LivroService livroService =
+                new LivroService(this.apiToken(req));
         List<Livro> meusLivros =
-                this.livroService.listarPorUsuario(
-                        usuarioId);
+                livroService.listarPorUsuario(usuarioId);
 
         List<Livro> livrosDisponiveis =
-                this.livroService.listarDisponiveis(
-                        usuarioId);
+                livroService.listarDisponiveis(usuarioId);
 
         req.setAttribute(
                 "meusLivros",
@@ -187,7 +181,7 @@ public class TrocaServlet extends BaseServlet {
 
         try {
 
-            this.trocaService.aceitar(
+            new TrocaService(this.apiToken(req)).aceitar(
                     this.paramLong(req, "id"),
                     usuarioId);
 
@@ -212,7 +206,7 @@ public class TrocaServlet extends BaseServlet {
 
         try {
 
-            this.trocaService.recusar(
+            new TrocaService(this.apiToken(req)).recusar(
                     this.paramLong(req, "id"),
                     usuarioId);
 
@@ -237,7 +231,7 @@ public class TrocaServlet extends BaseServlet {
 
         try {
 
-            this.trocaService.concluir(
+            new TrocaService(this.apiToken(req)).concluir(
                     this.paramLong(req, "id"),
                     usuarioId);
 
@@ -282,7 +276,7 @@ public class TrocaServlet extends BaseServlet {
 
         req.setAttribute(
                 "trocasConcluidas",
-                this.trocaService
+                new TrocaService(this.apiToken(req))
                         .listarConcluidasPorUsuario(
                                 usuarioId));
 

@@ -1,434 +1,70 @@
 package br.com.intercambiolivros.dao;
 
-import br.com.intercambiolivros.model.Livro;
+import br.com.intercambiolivros.config.ApiSingleton;
 import br.com.intercambiolivros.model.Troca;
-import br.com.intercambiolivros.model.Usuario;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
-public class TrocaDAO extends MysqlDAO {
+public class TrocaDAO {
 
-    public TrocaDAO() {
-        super();
+    private static final Type TROCA_LIST_TYPE =
+            TypeToken.getParameterized(List.class, Troca.class).getType();
+
+    private final ApiSingleton api = ApiSingleton.getInstance();
+    private final String token;
+
+    public TrocaDAO(String token) {
+        this.token = token;
     }
 
     public void inserir(Troca troca) {
-
-        String sql =
-                "INSERT INTO trocas "
-                        + "(livro_oferecido_id, livro_recebido_id, "
-                        + "usuario_oferecedor_id, usuario_recebedor_id, "
-                        + "status, mensagem) "
-                        + "VALUES (?, ?, ?, ?, ?, ?)";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    troca.getLivroOferecidoId(),
-                    troca.getLivroRecebidoId(),
-                    troca.getUsuarioOferecedorId(),
-                    troca.getUsuarioRecebedorId(),
-                    troca.getStatus(),
-                    troca.getMensagem());
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao inserir troca.", e);
-        }
+        Map<String, Object> payload = Map.of(
+                "livroOferecidoId", troca.getLivroOferecidoId(),
+                "livroRecebidoId", troca.getLivroRecebidoId(),
+                "mensagem", troca.getMensagem());
+        this.api.post("/trocas", this.token, payload, Void.class);
     }
 
     public Troca buscarPorId(Long id) {
-
-        String sql =
-                "SELECT "
-                        + "t.id AS troca_id, "
-                        + "t.livro_oferecido_id, "
-                        + "t.livro_recebido_id, "
-                        + "t.usuario_oferecedor_id, "
-                        + "t.usuario_recebedor_id, "
-                        + "t.status, "
-                        + "t.mensagem, "
-                        + "lo.titulo AS oferecido_titulo, "
-                        + "lo.autor AS oferecido_autor, "
-                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
-                        + "uo.nome AS oferecido_usuario_nome, "
-                        + "lr.titulo AS recebido_titulo, "
-                        + "lr.autor AS recebido_autor, "
-                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
-                        + "ur.nome AS recebido_usuario_nome "
-                        + "FROM trocas t "
-                        + "INNER JOIN livros lo "
-                        + "ON lo.id = t.livro_oferecido_id "
-                        + "INNER JOIN usuarios uo "
-                        + "ON uo.id = t.usuario_oferecedor_id "
-                        + "INNER JOIN livros lr "
-                        + "ON lr.id = t.livro_recebido_id "
-                        + "INNER JOIN usuarios ur "
-                        + "ON ur.id = t.usuario_recebedor_id "
-                        + "WHERE t.id = ?";
-
-        try (ResultSet rs = super.executar(sql, id)) {
-
-            if (rs.next()) {
-                return this.mapear(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao buscar troca.", e);
+        if (id == null) {
+            return null;
         }
-
-        return null;
+        return this.api.get("/trocas/" + id, this.token, Troca.class);
     }
 
     public List<Troca> listarPorUsuario(Long usuarioId) {
-
-        String sql =
-                "SELECT "
-                        + "t.id AS troca_id, "
-                        + "t.livro_oferecido_id, "
-                        + "t.livro_recebido_id, "
-                        + "t.usuario_oferecedor_id, "
-                        + "t.usuario_recebedor_id, "
-                        + "t.status, "
-                        + "t.mensagem, "
-                        + "lo.titulo AS oferecido_titulo, "
-                        + "lo.autor AS oferecido_autor, "
-                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
-                        + "uo.nome AS oferecido_usuario_nome, "
-                        + "lr.titulo AS recebido_titulo, "
-                        + "lr.autor AS recebido_autor, "
-                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
-                        + "ur.nome AS recebido_usuario_nome "
-                        + "FROM trocas t "
-                        + "INNER JOIN livros lo "
-                        + "ON lo.id = t.livro_oferecido_id "
-                        + "INNER JOIN usuarios uo "
-                        + "ON uo.id = t.usuario_oferecedor_id "
-                        + "INNER JOIN livros lr "
-                        + "ON lr.id = t.livro_recebido_id "
-                        + "INNER JOIN usuarios ur "
-                        + "ON ur.id = t.usuario_recebedor_id "
-                        + "WHERE t.usuario_oferecedor_id = ? "
-                        + "OR t.usuario_recebedor_id = ? "
-                        + "ORDER BY t.id DESC";
-
-        List<Troca> lista = new ArrayList<>();
-
-        try (ResultSet rs =
-                     super.executar(sql, usuarioId, usuarioId)) {
-
-            while (rs.next()) {
-                lista.add(this.mapear(rs));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao listar trocas do usuario.", e);
-        }
-
-        return lista;
+        return this.api.get("/trocas", this.token, TROCA_LIST_TYPE);
     }
 
-    public List<Troca> listarPendentesPorUsuario(
-            Long usuarioId) {
-
-        String sql =
-                "SELECT "
-                        + "t.id AS troca_id, "
-                        + "t.livro_oferecido_id, "
-                        + "t.livro_recebido_id, "
-                        + "t.usuario_oferecedor_id, "
-                        + "t.usuario_recebedor_id, "
-                        + "t.status, "
-                        + "t.mensagem, "
-                        + "lo.titulo AS oferecido_titulo, "
-                        + "lo.autor AS oferecido_autor, "
-                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
-                        + "uo.nome AS oferecido_usuario_nome, "
-                        + "lr.titulo AS recebido_titulo, "
-                        + "lr.autor AS recebido_autor, "
-                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
-                        + "ur.nome AS recebido_usuario_nome "
-                        + "FROM trocas t "
-                        + "INNER JOIN livros lo "
-                        + "ON lo.id = t.livro_oferecido_id "
-                        + "INNER JOIN usuarios uo "
-                        + "ON uo.id = t.usuario_oferecedor_id "
-                        + "INNER JOIN livros lr "
-                        + "ON lr.id = t.livro_recebido_id "
-                        + "INNER JOIN usuarios ur "
-                        + "ON ur.id = t.usuario_recebedor_id "
-                        + "WHERE t.status = 'PENDENTE' "
-                        + "AND t.usuario_recebedor_id = ? "
-                        + "ORDER BY t.id DESC";
-
-        List<Troca> lista = new ArrayList<>();
-
-        try (ResultSet rs =
-                     super.executar(sql, usuarioId)) {
-
-            while (rs.next()) {
-                lista.add(this.mapear(rs));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao listar trocas pendentes.", e);
-        }
-
-        return lista;
+    public List<Troca> listarPendentesPorUsuario(Long usuarioId) {
+        return this.api.get("/trocas/pendentes", this.token, TROCA_LIST_TYPE);
     }
 
-    public List<Troca> listarConcluidasPorUsuario(
-            Long usuarioId) {
-
-        String sql =
-                "SELECT "
-                        + "t.id AS troca_id, "
-                        + "t.livro_oferecido_id, "
-                        + "t.livro_recebido_id, "
-                        + "t.usuario_oferecedor_id, "
-                        + "t.usuario_recebedor_id, "
-                        + "t.status, "
-                        + "t.mensagem, "
-                        + "lo.titulo AS oferecido_titulo, "
-                        + "lo.autor AS oferecido_autor, "
-                        + "t.usuario_oferecedor_id AS oferecido_usuario_id, "
-                        + "uo.nome AS oferecido_usuario_nome, "
-                        + "lr.titulo AS recebido_titulo, "
-                        + "lr.autor AS recebido_autor, "
-                        + "t.usuario_recebedor_id AS recebido_usuario_id, "
-                        + "ur.nome AS recebido_usuario_nome "
-                        + "FROM trocas t "
-                        + "INNER JOIN livros lo "
-                        + "ON lo.id = t.livro_oferecido_id "
-                        + "INNER JOIN usuarios uo "
-                        + "ON uo.id = t.usuario_oferecedor_id "
-                        + "INNER JOIN livros lr "
-                        + "ON lr.id = t.livro_recebido_id "
-                        + "INNER JOIN usuarios ur "
-                        + "ON ur.id = t.usuario_recebedor_id "
-                        + "WHERE t.status = 'CONCLUIDA' "
-                        + "AND (t.usuario_oferecedor_id = ? "
-                        + "OR t.usuario_recebedor_id = ?) "
-                        + "ORDER BY t.id DESC";
-
-        List<Troca> lista = new ArrayList<>();
-
-        try (ResultSet rs =
-                     super.executar(sql, usuarioId, usuarioId)) {
-
-            while (rs.next()) {
-                lista.add(this.mapear(rs));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao listar trocas concluidas.", e);
-        }
-
-        return lista;
+    public List<Troca> listarConcluidasPorUsuario(Long usuarioId) {
+        return this.api.get("/trocas/concluidas", this.token, TROCA_LIST_TYPE);
     }
 
-    public boolean existeTrocaPendenteParaLivro(
-            Long livroId) {
-
-        String sql =
-                "SELECT COUNT(*) AS total "
-                        + "FROM trocas "
-                        + "WHERE status = 'PENDENTE' "
-                        + "AND ("
-                        + "livro_oferecido_id = ? "
-                        + "OR livro_recebido_id = ?"
-                        + ")";
-
-        try (ResultSet rs =
-                     super.executar(sql, livroId, livroId)) {
-
-            if (rs.next()) {
-                return rs.getInt("total") > 0;
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao verificar troca pendente.", e);
+    public void alterarStatus(Long id, String status) {
+        String acao;
+        if ("ACEITA".equals(status)) {
+            acao = "aceitar";
+        } else if ("RECUSADA".equals(status)) {
+            acao = "recusar";
+        } else {
+            throw new IllegalArgumentException("Status de troca invalido.");
         }
-
-        return false;
+        this.api.put("/trocas/" + id + "/" + acao, this.token, null, Void.class);
     }
 
-    public boolean existeTrocaAtivaOuConcluidaParaLivro(
-            Long livroId) {
-
-        String sql =
-                "SELECT COUNT(*) AS total "
-                        + "FROM trocas "
-                        + "WHERE status IN "
-                        + "('PENDENTE', 'ACEITA') "
-                        + "AND ("
-                        + "livro_oferecido_id = ? "
-                        + "OR livro_recebido_id = ?"
-                        + ")";
-
-        try (ResultSet rs =
-                     super.executar(sql, livroId, livroId)) {
-
-            if (rs.next()) {
-                return rs.getInt("total") > 0;
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao verificar disponibilidade do livro.", e);
-        }
-
-        return false;
-    }
-
-    public void alterarStatus(
-            Long id,
-            String status) {
-
-        String sql =
-                "UPDATE trocas "
-                        + "SET status = ? "
-                        + "WHERE id = ?";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    status,
-                    id);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao alterar status da troca.", e);
-        }
-    }
-
-    public void concluir(Troca troca, Long usuarioOferecedor,
-                         Long usuarioRecebedor) {
-
-        String atualizarTroca =
-                "UPDATE trocas SET status = 'CONCLUIDA' "
-                        + "WHERE id = ? AND status = 'ACEITA'";
-
-        String transferirLivros =
-                "UPDATE livros SET usuario_id = CASE id "
-                        + "WHEN ? THEN ? WHEN ? THEN ? END, "
-                        + "disponivel = FALSE "
-                        + "WHERE id IN (?, ?)";
-
-        try {
-            super.executarUpdate(
-                    atualizarTroca,
-                    troca.getId());
-
-            super.executarUpdate(
-                    transferirLivros,
-                    troca.getLivroOferecidoId(),
-                    usuarioRecebedor,
-                    troca.getLivroRecebidoId(),
-                    usuarioOferecedor,
-                    troca.getLivroOferecidoId(),
-                    troca.getLivroRecebidoId());
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao concluir troca.", e);
-        }
-    }
-
-    private Troca mapear(ResultSet rs)
-            throws SQLException {
-
-        Troca troca = new Troca();
-
-        troca.setId(
-                rs.getLong("troca_id"));
-
-        troca.setLivroOferecidoId(
-                rs.getLong("livro_oferecido_id"));
-
-        troca.setLivroRecebidoId(
-                rs.getLong("livro_recebido_id"));
-
-        troca.setUsuarioOferecedorId(
-                rs.getLong("usuario_oferecedor_id"));
-
-        troca.setUsuarioRecebedorId(
-                rs.getLong("usuario_recebedor_id"));
-
-        troca.setStatus(
-                rs.getString("status"));
-
-        troca.setMensagem(
-                rs.getString("mensagem"));
-
-        Livro livroOferecido = new Livro();
-
-        livroOferecido.setId(
-                rs.getLong("livro_oferecido_id"));
-
-        livroOferecido.setTitulo(
-                rs.getString("oferecido_titulo"));
-
-        livroOferecido.setAutor(
-                rs.getString("oferecido_autor"));
-
-        livroOferecido.setUsuarioId(
-                rs.getLong("oferecido_usuario_id"));
-
-        Usuario usuarioOferecido =
-                new Usuario();
-
-        usuarioOferecido.setId(
-                rs.getLong("oferecido_usuario_id"));
-
-        usuarioOferecido.setNome(
-                rs.getString("oferecido_usuario_nome"));
-
-        livroOferecido.setUsuario(
-                usuarioOferecido);
-
-        troca.setLivroOferecido(
-                livroOferecido);
-
-        Livro livroRecebido = new Livro();
-
-        livroRecebido.setId(
-                rs.getLong("livro_recebido_id"));
-
-        livroRecebido.setTitulo(
-                rs.getString("recebido_titulo"));
-
-        livroRecebido.setAutor(
-                rs.getString("recebido_autor"));
-
-        livroRecebido.setUsuarioId(
-                rs.getLong("recebido_usuario_id"));
-
-        Usuario usuarioRecebido =
-                new Usuario();
-
-        usuarioRecebido.setId(
-                rs.getLong("recebido_usuario_id"));
-
-        usuarioRecebido.setNome(
-                rs.getString("recebido_usuario_nome"));
-
-        livroRecebido.setUsuario(
-                usuarioRecebido);
-
-        troca.setLivroRecebido(
-                livroRecebido);
-
-        return troca;
+    public void concluir(Long trocaId) {
+        this.api.put(
+                "/trocas/" + trocaId + "/concluir",
+                this.token,
+                null,
+                Void.class);
     }
 }

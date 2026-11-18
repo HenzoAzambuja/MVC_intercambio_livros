@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -36,6 +37,11 @@ public abstract class BaseServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    protected String apiToken(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        return session == null ? null : (String) session.getAttribute("apiToken");
     }
 
     protected void forward(HttpServletRequest req, HttpServletResponse resp, String jsp)
