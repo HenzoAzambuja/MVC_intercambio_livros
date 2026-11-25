@@ -45,10 +45,6 @@
                 Usuarios
             </a>
 
-            <a href="${pageContext.request.contextPath}/perfis">
-                Perfis
-            </a>
-
             <a href="${pageContext.request.contextPath}/logout">
                 Sair
             </a>
@@ -148,51 +144,15 @@
             </div>
 
 
-            <div class="form-group">
-
-                <label for="senha">
-                    Senha
-                </label>
-
-                <input type="password"
-                       id="senha"
-                       name="senha"
-                       value="<c:out value='${usuario.senha}' />"
-                       required>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="perfilId">
-                    Perfil
-                </label>
-
-                <select id="perfilId"
-                        name="perfilId"
+            <c:if test="${empty usuario.id}">
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input type="password"
+                        id="senha"
+                        name="senha"
                         required>
-
-                    <option value="">
-                        Selecione
-                    </option>
-
-                    <c:forEach var="perfil" items="${perfis}">
-
-                        <option value="${perfil.id}"
-                            <c:if test="${usuario.perfilId == perfil.id}">
-                                selected
-                            </c:if>>
-
-                            <c:out value="${perfil.nome}" />
-
-                        </option>
-
-                    </c:forEach>
-
-                </select>
-
-            </div>
+                </div>
+            </c:if>
 
 
             <div class="actions">

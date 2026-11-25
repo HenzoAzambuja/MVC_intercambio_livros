@@ -2,7 +2,6 @@ package br.com.intercambiolivros.service;
 
 import java.util.List;
 
-import br.com.intercambiolivros.dao.PerfilDAO;
 import br.com.intercambiolivros.dao.UsuarioDAO;
 import br.com.intercambiolivros.model.Usuario;
 
@@ -18,11 +17,9 @@ public class UsuarioService {
     private static final long PERFIL_NORMAL_ID = 2L;
 
     private final UsuarioDAO usuarioDAO;
-    private final PerfilDAO perfilDAO;
 
     public UsuarioService() {
         this.usuarioDAO = new UsuarioDAO();
-        this.perfilDAO = new PerfilDAO();
     }
 
 
@@ -61,31 +58,30 @@ public class UsuarioService {
     }
 
     public void salvar(Usuario usuario) {
-
         if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "Usuario e obrigatorio.");
+            throw new IllegalArgumentException("Usuario e obrigatorio.");
         }
 
         this.prepararDados(usuario);
-
         this.validarCamposObrigatorios(usuario);
         this.validarEmail(usuario.getEmail());
-        this.validarSenha(usuario.getSenha());
-        this.validarPerfilExistente(usuario.getPerfilId());
-        this.validarLoginUnico(usuario);
-        this.validarEmailUnico(usuario);
 
         if (usuario.getId() == null) {
+            if (usuario.getSenha() == null) {
+                throw new IllegalArgumentException(
+                        "Senha e obrigatoria para novo usuario."
+                );
+            }
 
+            this.validarSenha(usuario.getSenha());
             this.usuarioDAO.inserir(usuario);
             return;
         }
 
         if (this.usuarioDAO.buscarPorId(usuario.getId()) == null) {
-
             throw new IllegalArgumentException(
-                    "Usuario nao encontrado para alteracao.");
+                    "Usuario nao encontrado para alteracao."
+            );
         }
 
         this.usuarioDAO.alterar(usuario);
@@ -148,15 +144,10 @@ public class UsuarioService {
                     "Login e obrigatorio.");
         }
 
-        if (usuario.getSenha() == null) {
-            throw new IllegalArgumentException(
-                    "Senha e obrigatoria.");
-        }
-
-        if (usuario.getPerfilId() == null) {
-            throw new IllegalArgumentException(
-                    "Perfil e obrigatorio.");
-        }
+        // if (usuario.getSenha() == null) {
+        //     throw new IllegalArgumentException(
+        //             "Senha e obrigatoria.");
+        // }
     }
 
 
@@ -178,62 +169,6 @@ public class UsuarioService {
 
             throw new IllegalArgumentException(
                     "Informe um email valido.");
-        }
-    }
-
-    private void validarPerfilExistente(Long perfilId) {
-
-        if (this.perfilDAO.buscarPorId(perfilId) == null) {
-
-            throw new IllegalArgumentException(
-                    "Perfil informado nao existe.");
-        }
-    }
-
-
-    private void validarLoginUnico(Usuario usuario) {
-
-        Usuario existente =
-                this.usuarioDAO.buscarPorLogin(
-                        usuario.getLogin());
-
-        if (existente == null) {
-            return;
-        }
-
-        if (usuario.getId() == null) {
-
-            throw new IllegalArgumentException(
-                    "Ja existe um usuario com este login.");
-        }
-
-        if (!existente.getId().equals(usuario.getId())) {
-
-            throw new IllegalArgumentException(
-                    "Ja existe um usuario com este login.");
-        }
-    }
-
-    private void validarEmailUnico(Usuario usuario) {
-
-        Usuario existente =
-                this.usuarioDAO.buscarPorEmail(
-                        usuario.getEmail());
-
-        if (existente == null) {
-            return;
-        }
-
-        if (usuario.getId() == null) {
-
-            throw new IllegalArgumentException(
-                    "Ja existe um usuario com este email.");
-        }
-
-        if (!existente.getId().equals(usuario.getId())) {
-
-            throw new IllegalArgumentException(
-                    "Ja existe um usuario com este email.");
         }
     }
 

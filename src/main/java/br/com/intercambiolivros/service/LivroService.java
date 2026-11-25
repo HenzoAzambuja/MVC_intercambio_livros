@@ -13,10 +13,6 @@ public class LivroService {
         this.livroDAO = new LivroDAO();
     }
 
-    public List<Livro> listar() {
-        return this.livroDAO.listarTodos();
-    }
-
     public List<Livro> listarDisponiveis(Long usuarioId) {
 
         if (usuarioId == null) {
@@ -56,107 +52,47 @@ public class LivroService {
         return this.livroDAO.buscarPorId(id);
     }
 
+    private void validarUsuario(Long usuarioId) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException(
+                    "Usuario nao identificado."
+            );
+        }
+    }
+
+    private void validarId(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException(
+                    "Id do livro invalido."
+            );
+        }
+    }
+
     public void alterarDisponibilidade(Long id, Long usuarioId) {
-
-        if (id == null || usuarioId == null) {
-            throw new IllegalArgumentException(
-                    "Livro e usuario sao obrigatorios.");
-        }
-
-        Livro livro = this.livroDAO.buscarPorId(id);
-
-        if (livro == null) {
-            throw new IllegalArgumentException(
-                    "Livro nao encontrado.");
-        }
-
-        if (!livro.getUsuarioId().equals(usuarioId)) {
-            throw new IllegalArgumentException(
-                    "Voce nao pode alterar este livro.");
-        }
-
-        if (this.livroDAO.existeTrocaAtivaParaLivro(id)) {
-            throw new IllegalArgumentException(
-                    "Este livro esta envolvido em uma troca.");
-        }
-
-        this.livroDAO.alterarDisponibilidade(
-                id,
-                !livro.isDisponivel());
+        this.validarId(id);
+        this.validarUsuario(usuarioId);
+        this.livroDAO.alterarDisponibilidade(id);
     }
 
     public void salvar(Livro livro, Long usuarioId) {
-
         if (livro == null) {
-            throw new IllegalArgumentException(
-                    "Livro e obrigatorio.");
+            throw new IllegalArgumentException("Livro e obrigatorio.");
         }
 
-        if (usuarioId == null) {
-            throw new IllegalArgumentException(
-                    "Usuario nao identificado.");
-        }
-
+        this.validarUsuario(usuarioId);
         this.prepararDados(livro);
         this.validarCamposObrigatorios(livro);
 
         if (livro.getId() == null) {
-
-            livro.setUsuarioId(usuarioId);
             this.livroDAO.inserir(livro);
-
-            return;
+        } else {
+            this.livroDAO.alterar(livro);
         }
-
-        Livro existente =
-                this.livroDAO.buscarPorId(livro.getId());
-
-        if (existente == null) {
-            throw new IllegalArgumentException(
-                    "Livro nao encontrado.");
-        }
-
-        if (!existente.getUsuarioId().equals(usuarioId)) {
-            throw new IllegalArgumentException(
-                    "Voce nao pode alterar este livro.");
-        }
-
-        livro.setUsuarioId(usuarioId);
-
-        this.livroDAO.alterar(livro);
     }
 
     public void deletar(Long id, Long usuarioId) {
-
-        if (id == null) {
-            throw new IllegalArgumentException(
-                    "Id e obrigatorio para excluir.");
-        }
-
-        if (usuarioId == null) {
-            throw new IllegalArgumentException(
-                    "Usuario nao identificado.");
-        }
-
-        Livro livro =
-                this.livroDAO.buscarPorId(id);
-
-        if (livro == null) {
-            throw new IllegalArgumentException(
-                    "Livro nao encontrado.");
-        }
-
-        if (!livro.getUsuarioId().equals(usuarioId)) {
-            throw new IllegalArgumentException(
-                    "Voce nao pode excluir este livro.");
-        }
-
-        if (this.livroDAO.existeTrocaParaLivro(id)) {
-            throw new IllegalArgumentException(
-                    "Nao e possivel excluir um livro que "
-                            + "ja participou de uma troca.");
-        }
-
+        this.validarId(id);
+        this.validarUsuario(usuarioId);
         this.livroDAO.deletar(id);
     }
 

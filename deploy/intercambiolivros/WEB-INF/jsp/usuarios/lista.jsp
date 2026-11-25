@@ -35,10 +35,6 @@
                 Usuarios
             </a>
 
-            <a href="${pageContext.request.contextPath}/perfis">
-                Perfis
-            </a>
-
             <a href="${pageContext.request.contextPath}/logout">
                 Sair
             </a>
@@ -98,7 +94,6 @@
                         <th>Nome</th>
                         <th>Email</th>
                         <th>Login</th>
-                        <th>Perfil</th>
                         <th>Acoes</th>
 
                     </tr>
@@ -128,7 +123,7 @@
                             </td>
 
                             <td>
-                                <c:out value="${usuario.perfil.nome}" />
+                                <c:out value="${usuario.perfilId}" />
                             </td>
 
                             <td class="links">

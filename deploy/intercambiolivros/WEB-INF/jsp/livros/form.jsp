@@ -52,9 +52,9 @@
                 Meus livros
             </a>
 
-            <a href="${pageContext.request.contextPath}/pessoas">
+            <!-- <a href="${pageContext.request.contextPath}/pessoas">
                 Pessoas
-            </a>
+            </a> -->
 
             <a href="${pageContext.request.contextPath}/trocas">
                 Trocas

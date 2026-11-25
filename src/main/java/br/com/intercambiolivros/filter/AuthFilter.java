@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+
 import br.com.intercambiolivros.model.Usuario;
+import br.com.intercambiolivros.config.ApiDAO;
 
 @WebFilter(urlPatterns = {"/home", "/livros", "/livros/*", "/trocas", "/trocas/*", "/usuarios", "/usuarios/*", "/pessoas", "/pessoas/*"})
 public class AuthFilter implements Filter {
@@ -25,22 +27,40 @@ public class AuthFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         HttpSession session = req.getSession(false);
 
-        Usuario usuarioLogado = null;
-        if (session != null) {
-            usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
-        }
+        Usuario usuarioLogado = session == null
+            ? null
+            : (Usuario) session.getAttribute("usuarioLogado");
 
         if (usuarioLogado == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        if (req.getRequestURI().substring(req.getContextPath().length()).startsWith("/usuarios")
-                && !Long.valueOf(1L).equals(usuarioLogado.getPerfilId())) {
+        String token = (String) session.getAttribute("jwtToken");
+
+        if (token == null || token.isBlank()) {
+            session.invalidate();
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        String caminho = req.getRequestURI().substring(req.getContextPath().length());
+
+        boolean rotaRestrita =
+                caminho.startsWith("/usuarios")
+                || caminho.startsWith("/pessoas");
+
+        if (rotaRestrita && !Long.valueOf(1L).equals(usuarioLogado.getPerfilId())) {
             resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
 
-        chain.doFilter(request, response);
+        ApiDAO.definirTokenApi(token);
+
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            ApiDAO.limparTokenApi();
+        }
     }
 }

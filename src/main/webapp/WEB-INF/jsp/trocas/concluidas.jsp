@@ -49,9 +49,9 @@
                 Trocas
             </a>
 
-            <a href="${pageContext.request.contextPath}/pessoas">
+            <!-- <a href="${pageContext.request.contextPath}/pessoas">
                 Pessoas
-            </a>            
+            </a>             -->
 
             <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
                 <a href="${pageContext.request.contextPath}/usuarios">
@@ -144,12 +144,26 @@
 
                         <p>
                             <strong>Quem ofereceu:</strong>
-                            <c:out value="${troca.livroOferecido.usuario.nome}" />
+                            <c:choose>
+                                <c:when test="${not empty troca.livroOferecido.usuarioId}">
+                                    Usuário #<c:out value="${troca.livroOferecido.usuarioId}" />
+                                </c:when>
+                                <c:otherwise>
+                                    Usuário não informado
+                                </c:otherwise>
+                            </c:choose>
                         </p>
 
                         <p>
                             <strong>Quem recebeu:</strong>
-                            <c:out value="${troca.livroRecebido.usuario.nome}" />
+                            <c:choose>
+                                <c:when test="${not empty troca.livroRecebido.usuarioId}">
+                                    Usuário #<c:out value="${troca.livroRecebido.usuarioId}" />
+                                </c:when>
+                                <c:otherwise>
+                                    Usuário não informado
+                                </c:otherwise>
+                            </c:choose>
                         </p>
 
                         <p>

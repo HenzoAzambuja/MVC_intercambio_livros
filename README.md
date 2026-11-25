@@ -104,24 +104,35 @@ O script de inicialização do banco (`init.sql`) já popula usuários de teste:
 
 Certifique-se de ter o **Docker** e o **Docker Compose** instalados na sua máquina.
 
-1. No terminal, na raiz do projeto, execute:
+O backend (API e MySQL) e o frontend possuem arquivos `docker-compose.yml` separados. A partir da pasta que contém os diretórios `MVC_intercambio_livros_API` e `MVC_intercambio_livros`, inicie os dois:
+
+1. No terminal, inicie a API e o banco:
    ```bash
+   cd MVC_intercambio_livros_API
    docker compose up -d
    ```
-   *(ou `docker-compose up -d`)*
 
-2. O Docker iniciará:
-   - Container do **MySQL 8.4** executando automaticamente o script `init.sql`.
-   - Container do **Apache Tomcat 10.1** implantando a aplicação contida na pasta `deploy`.
+2. Em outro terminal, inicie o frontend:
+   ```bash
+   cd MVC_intercambio_livros
+   mvn clean package
+   docker compose up -d
+   ```
+
+   O build gera `deploy/intercambiolivros.war`, montado diretamente no Tomcat para evitar que uma pasta expandida antiga prevaleça sobre o WAR atualizado.
+
+   A API e o MySQL ficam disponíveis para o frontend nas portas `8080` e `3306`; o frontend fica na porta `8081`. O nome `mysql` usado pela API só é resolvido dentro da rede Docker do backend.
 
 3. Abra o navegador e acesse:
    ```text
-   http://localhost:8080/intercambiolivros
+   http://localhost:8081/intercambiolivros
    ```
 
-4. Para parar os containers:
-   ```bash
-   docker compose down
+4. Para parar os containers, execute `docker compose down` em cada pasta.
+
+Ao executar a API fora do Docker, configure `MYSQL_URL` no ambiente do processo da API para apontar para o banco publicado no host. No PowerShell:
+   ```powershell
+   $env:MYSQL_URL = "jdbc:mysql://localhost:3306/mvc_java?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8"
    ```
 
 ---

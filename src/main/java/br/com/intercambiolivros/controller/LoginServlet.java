@@ -47,7 +47,20 @@ public class LoginServlet extends BaseServlet {
                     this.param(req, "login"),
                     this.param(req, "senha"));
 
-            req.getSession(true).setAttribute("usuarioLogado", usuario);
+            String token = usuario.getToken();
+
+            if (token == null || token.isBlank()) {
+                throw new IllegalStateException(
+                        "A API não retornou o token de autenticação."
+                );
+            }
+
+            usuario.setToken(null);
+
+            HttpSession session = req.getSession(true);
+            session.setAttribute("usuarioLogado", usuario);
+            session.setAttribute("jwtToken", token);
+
             this.redirect(req, resp, "/home");
         } catch (IllegalArgumentException e) {
             req.setAttribute("erro", e.getMessage());

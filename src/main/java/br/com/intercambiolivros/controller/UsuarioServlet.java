@@ -1,7 +1,6 @@
 package br.com.intercambiolivros.controller;
 
 import br.com.intercambiolivros.model.Usuario;
-import br.com.intercambiolivros.service.PerfilService;
 import br.com.intercambiolivros.service.UsuarioService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,7 +21,6 @@ public class UsuarioServlet extends BaseServlet {
     private static final String FORM = "/WEB-INF/jsp/usuarios/form.jsp";
 
     private final UsuarioService usuarioService = new UsuarioService();
-    private final PerfilService perfilService = new PerfilService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -98,7 +96,6 @@ public class UsuarioServlet extends BaseServlet {
         }
 
         req.setAttribute("usuario", usuario);
-        req.setAttribute("perfis", this.perfilService.listar());
 
         this.forward(req, resp, FORM);
     }
@@ -112,7 +109,6 @@ public class UsuarioServlet extends BaseServlet {
         usuario.setEmail(this.param(req, "email"));
         usuario.setLogin(this.param(req, "login"));
         usuario.setSenha(this.param(req, "senha"));
-        usuario.setPerfilId(this.paramLong(req, "perfilId"));
 
         return usuario;
     }

@@ -44,9 +44,9 @@
                 Meus livros
             </a>
 
-            <a href="${pageContext.request.contextPath}/pessoas">
+            <!-- <a href="${pageContext.request.contextPath}/pessoas">
                 Pessoas
-            </a>
+            </a> -->
 
             <a href="${pageContext.request.contextPath}/trocas">
                 Trocas
@@ -171,12 +171,26 @@
 
                         <p>
                             <strong>Quem oferece:</strong>
-                            <c:out value="${troca.livroOferecido.usuario.nome}" />
+                            <c:choose>
+                                <c:when test="${not empty troca.livroOferecido.usuarioId}">
+                                    Usuário #<c:out value="${troca.livroOferecido.usuarioId}" />
+                                </c:when>
+                                <c:otherwise>
+                                    Usuário não informado
+                                </c:otherwise>
+                            </c:choose>
                         </p>
 
                         <p>
                             <strong>Quem recebe:</strong>
-                            <c:out value="${troca.livroRecebido.usuario.nome}" />
+                            <c:choose>
+                                <c:when test="${not empty troca.livroRecebido.usuarioId}">
+                                    Usuário #<c:out value="${troca.livroRecebido.usuarioId}" />
+                                </c:when>
+                                <c:otherwise>
+                                    Usuário não informado
+                                </c:otherwise>
+                            </c:choose>
                         </p>
 
                         <p>

@@ -45,10 +45,11 @@
                         <a href="${pageContext.request.contextPath}/trocas">
                             Trocas
                         </a>
-
-                        <a href="${pageContext.request.contextPath}/pessoas">
-                            Pessoas
-                        </a>
+                        <c:if test="${mostrarPessoas}">
+                            <a href="${pageContext.request.contextPath}/pessoas">
+                                Pessoas
+                            </a>
+                        </c:if>
 
                         <c:if test="${sessionScope.usuarioLogado.perfilId == 1}">
                             <a href="${pageContext.request.contextPath}/usuarios">
@@ -291,7 +292,7 @@
                 </section>
 
                 <!-- PESSOAS -->
-
+<!-- 
                 <section class="home-section">
 
                     <div class="section-header">
@@ -355,7 +356,7 @@
 
                     </c:choose>
 
-                </section>
+                </section> -->
 
             </main>
 

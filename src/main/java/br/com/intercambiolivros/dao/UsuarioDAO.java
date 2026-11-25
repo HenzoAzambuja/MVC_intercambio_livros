@@ -1,10 +1,17 @@
 package br.com.intercambiolivros.dao;
 
+import com.google.gson.Gson;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
+import br.com.intercambiolivros.config.ApiDAO;
 import br.com.intercambiolivros.model.Usuario;
 import br.com.intercambiolivros.model.Perfil;
 
@@ -13,231 +20,141 @@ import br.com.intercambiolivros.model.Perfil;
  *
  * Responsavel pelo acesso ao banco de dados.
  */
-public class UsuarioDAO extends MysqlDAO {
+public class UsuarioDAO extends ApiDAO {
 
     public UsuarioDAO() {
         super();
     }
 
-    public Usuario buscarPorLoginESenha(String login, String senha) {
+    private static final Gson GSON = new Gson();
+    private static final HttpClient HTTP = HttpClient.newHttpClient();
 
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.login = ? AND u.senha = ? "
-                    + "AND u.ativo = TRUE";
+    private static final String API_BASE_URL = obterApiBaseUrl();
 
-        try (ResultSet rs = super.executar(sql, login, senha)) {
+    private static String obterApiBaseUrl() {
+        String url = System.getenv("API_BASE_URL");
 
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar usuario.", e);
+        if (url == null || url.isBlank()) {
+            url = "http://localhost:8080/intercambiolivros";
         }
 
-        return null;
+        return url.replaceAll("/+$", "");
+    }
+
+    public Usuario buscarPorLoginESenha(String login, String senha) {
+        LoginRequest dados = new LoginRequest();
+        dados.login = login;
+        dados.senha = senha;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_BASE_URL + "/api/auth/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(dados)))
+                .build();
+
+        try {
+            HttpResponse<String> response = HTTP.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            if (response.statusCode() == 401) {
+                return null;
+            }
+
+            if (response.statusCode() != 200) {
+                ApiError erro = GSON.fromJson(response.body(), ApiError.class);
+                String mensagem = erro == null || erro.erro == null
+                        ? "Falha na autenticação pela API."
+                        : erro.erro;
+
+                if (response.statusCode() >= 400
+                        && response.statusCode() < 500) {
+                    throw new IllegalArgumentException(mensagem);
+                }
+
+                throw new IllegalStateException(mensagem);
+            }
+
+            LoginResponse resultado =
+                    GSON.fromJson(response.body(), LoginResponse.class);
+
+            if (resultado == null
+                    || resultado.token == null
+                    || resultado.usuarioId == null) {
+                throw new IllegalStateException(
+                        "A API retornou uma resposta de login incompleta."
+                );
+            }
+
+            Usuario usuario = new Usuario();
+            usuario.setId(resultado.usuarioId);
+            usuario.setNome(resultado.nome);
+            usuario.setLogin(login);
+            usuario.setPerfilId(resultado.perfilId);
+            usuario.setAtivo(true);
+            usuario.setToken(resultado.token);
+
+            Perfil perfil = new Perfil();
+            perfil.setId(resultado.perfilId);
+            usuario.setPerfil(perfil);
+
+            return usuario;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(
+                    "A chamada de autenticação foi interrompida.", e
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Não foi possível conectar à API para autenticar.", e
+            );
+        }
     }
 
     public List<Usuario> listarTodos() {
 
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.ativo = TRUE "
-                        + "ORDER BY u.nome";
-
-        List<Usuario> lista = new ArrayList<>();
-
-        try (ResultSet rs = super.executar(sql)) {
-
-            while (rs.next()) {
-                lista.add(this.mapearComPerfil(rs));
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar usuarios.", e);
-        }
-
-        return lista;
+        return apiGetLista("/api/usuarios", Usuario.class);
     }
 
     public Usuario buscarPorId(Long id) {
-
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                        + "WHERE u.id = ?";
-
-        try (ResultSet rs = super.executar(sql, id)) {
-
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
+        try {
+            return apiGet("/api/usuarios/" + id, Usuario.class);
+        } catch (ApiException e) {
+            if (e.getStatusCode() == 404) {
+                return null;
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar por id.", e);
+            throw e;
         }
-
-        return null;
-    }
-
-    public Usuario buscarPorLogin(String login) {
-
-        String sql =
-                "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                    + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                        + "FROM usuarios u "
-                        + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                        + "WHERE u.login = ?";
-
-        try (ResultSet rs = super.executar(sql, login)) {
-
-            if (rs.next()) {
-                return this.mapearComPerfil(rs);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao buscar por login.", e);
-        }
-
-        return null;
-    }
-
-    public Usuario buscarPorEmail(String email) {
-
-        String sql =
-            "SELECT u.id, u.nome, u.email, u.login, u.senha, "
-                + "u.perfil_id, u.ativo, p.nome AS perfil_nome "
-                    + "FROM usuarios u "
-                    + "INNER JOIN perfis p ON p.id = u.perfil_id "
-                    + "WHERE u.email = ?";
-
-    try (ResultSet rs = super.executar(sql, email)) {
-
-        if (rs.next()) {
-            return this.mapearComPerfil(rs);
-        }
-
-    } catch (SQLException e) {
-        throw new RuntimeException(
-                "Erro ao buscar por email.", e);
-    }
-
-    return null;
-}
-
-    public int contarPorPerfil(Long perfilId) {
-
-        String sql =
-                "SELECT COUNT(*) AS total "
-                        + "FROM usuarios "
-                        + "WHERE perfil_id = ?";
-
-        try (ResultSet rs = super.executar(sql, perfilId)) {
-
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erro ao contar usuarios por perfil.", e);
-        }
-
-        return 0;
     }
 
     public void inserir(Usuario usuario) {
-
-        String sql =
-                "INSERT INTO usuarios "
-                    + "(nome, email, login, senha, perfil_id, ativo) "
-                    + "VALUES (?, ?, ?, ?, ?, TRUE)";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getLogin(),
-                    usuario.getSenha(),
-                    usuario.getPerfilId()
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir.", e);
-        }
+        apiPost("/api/usuarios/cadastro", usuario);
     }
 
     public void alterar(Usuario usuario) {
-
-        String sql =
-                "UPDATE usuarios "
-                        + "SET nome = ?, email = ?, login = ?, "
-                        + "senha = ?, perfil_id = ? "
-                        + "WHERE id = ?";
-
-        try {
-
-            super.executarUpdate(
-                    sql,
-                    usuario.getNome(),
-                    usuario.getEmail(),
-                    usuario.getLogin(),
-                    usuario.getSenha(),
-                    usuario.getPerfilId(),
-                    usuario.getId()
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao alterar.", e);
-        }
+        apiPut("/api/usuarios/" + usuario.getId(), usuario);
     }
 
     public void deletar(Long id) {
-
-        String sql =
-            "UPDATE usuarios SET ativo = FALSE "
-                + "WHERE id = ?";
-
-        try {
-
-            super.executarUpdate(sql, id);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao desativar usuario.", e);
-        }
+        apiDelete("/api/usuarios/" + id);
     }
 
-    private Usuario mapearComPerfil(ResultSet rs)
-            throws SQLException {
-
-        Usuario usuario = new Usuario();
-
-        usuario.setId(rs.getLong("id"));
-        usuario.setNome(rs.getString("nome"));
-        usuario.setEmail(rs.getString("email"));
-        usuario.setLogin(rs.getString("login"));
-        usuario.setSenha(rs.getString("senha"));
-        usuario.setPerfilId(rs.getLong("perfil_id"));
-        usuario.setAtivo(rs.getBoolean("ativo"));
-                
-        Perfil perfil = new Perfil();
-
-        perfil.setId(rs.getLong("perfil_id"));
-        perfil.setNome(rs.getString("perfil_nome"));
-
-        usuario.setPerfil(perfil);
-
-        return usuario;
+    private static class LoginRequest {
+        private String login;
+        private String senha;
     }
+
+    private static class LoginResponse {
+        private String token;
+        private Long usuarioId;
+        private String nome;
+        private Long perfilId;
+    }
+
+    private static class ApiError {
+        private String erro;
+    }
+
 }

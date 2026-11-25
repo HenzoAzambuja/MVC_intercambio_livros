@@ -53,8 +53,13 @@ public class HomeServlet extends BaseServlet {
                 this.livroService.listarPorUsuario(
                         usuarioLogado.getId());
 
-        List<Usuario> usuarios =
-                this.usuarioService.listar();
+        boolean administrador = Long.valueOf(1L).equals(usuarioLogado.getPerfilId());
+
+        List<Usuario> usuarios = administrador
+                ? this.usuarioService.listar()
+                : List.<Usuario>of();
+
+        req.setAttribute("mostrarPessoas", administrador);
 
         List<Troca> trocas =
                 this.trocaService.listarPorUsuario(

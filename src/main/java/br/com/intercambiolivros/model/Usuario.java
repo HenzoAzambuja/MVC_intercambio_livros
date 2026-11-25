@@ -10,6 +10,7 @@ public class Usuario {
     private Long perfilId;
     private boolean ativo;
     private Perfil perfil;
+    private transient String token;
 
     public Long getId() {
         return id;
@@ -73,5 +74,13 @@ public class Usuario {
 
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
