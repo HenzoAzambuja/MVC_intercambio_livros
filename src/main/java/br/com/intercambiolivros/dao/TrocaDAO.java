@@ -9,16 +9,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-public class TrocaDAO {
+public class TrocaDAO extends ApiDAO {
 
     private static final Type TROCA_LIST_TYPE =
             TypeToken.getParameterized(List.class, Troca.class).getType();
 
-    private final ApiSingleton api = ApiSingleton.getInstance();
-    private final String token;
-
     public TrocaDAO(String token) {
-        this.token = token;
+        super(token);
     }
 
     public void inserir(Troca troca) {

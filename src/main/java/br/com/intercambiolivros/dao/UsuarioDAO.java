@@ -12,16 +12,13 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-public class UsuarioDAO {
+public class UsuarioDAO extends ApiDAO {
 
     private static final Type USUARIO_LIST_TYPE =
             TypeToken.getParameterized(List.class, Usuario.class).getType();
 
-    private final ApiSingleton api = ApiSingleton.getInstance();
-    private final String token;
-
     public UsuarioDAO(String token) {
-        this.token = token;
+        super(token);
     }
 
     public Usuario buscarPorLoginESenha(String login, String senha) {

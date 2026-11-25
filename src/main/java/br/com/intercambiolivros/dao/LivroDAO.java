@@ -3,22 +3,21 @@ package br.com.intercambiolivros.dao;
 import br.com.intercambiolivros.config.ApiSingleton;
 import br.com.intercambiolivros.config.ApiException;
 import br.com.intercambiolivros.model.Livro;
+import br.com.intercambiolivros.dao.ApiDAO;
 
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class LivroDAO {
+public class LivroDAO extends ApiDAO {
 
     private static final Type LIVRO_LIST_TYPE =
             TypeToken.getParameterized(List.class, Livro.class).getType();
 
-    private final ApiSingleton api = ApiSingleton.getInstance();
-    private final String token;
 
     public LivroDAO(String token) {
-        this.token = token;
+        super(token);
     }
 
     public List<Livro> listarTodos() {
