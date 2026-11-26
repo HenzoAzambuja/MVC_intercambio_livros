@@ -28,6 +28,7 @@ public class UsuarioDAO extends ApiDAO {
                 Map.of("login", login, "senha", senha),
                 JsonObject.class);
 
+        // cria usuario
         Usuario usuario = new Usuario();
         usuario.setId(response.get("usuarioId").getAsLong());
         usuario.setNome(response.get("nome").getAsString());

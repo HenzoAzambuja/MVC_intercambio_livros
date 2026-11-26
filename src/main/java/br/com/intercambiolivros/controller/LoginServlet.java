@@ -45,10 +45,12 @@ public class LoginServlet extends BaseServlet {
         req.setCharacterEncoding("UTF-8");
 
         try {
+            // autentica usuario e senha
             Usuario usuario = this.usuarioService.autenticar(
                     this.param(req, "login"),
                     this.param(req, "senha"));
 
+            // cria sessao e guarda usuario e token
             HttpSession session = req.getSession(true);
             session.setAttribute("apiToken", usuario.getApiToken());
             usuario.setApiToken(null);

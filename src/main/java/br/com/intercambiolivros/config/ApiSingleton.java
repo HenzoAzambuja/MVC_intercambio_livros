@@ -16,32 +16,31 @@ import java.time.Duration;
 
 public final class ApiSingleton {
 
-    private static final String DEFAULT_BASE_URL =
-            "http://localhost:8080/intercambiolivros/api";
+    private static final String BASE_URL =
+            "http://host.docker.internal:8080/intercambiolivros/api";
 
     private static final ApiSingleton INSTANCE = new ApiSingleton();
 
     private final String baseUrl;
-    private final Gson gson = new Gson();
-    private final HttpClient client = HttpClient.newBuilder()
+    private final Gson gson;
+    private final HttpClient client;
+
+    
+    private ApiSingleton() {
+        
+        this.client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private ApiSingleton() {
-        String configuredUrl = System.getProperty("api.baseUrl");
-        if (configuredUrl == null || configuredUrl.isBlank()) {
-            configuredUrl = System.getenv("API_BASE_URL");
-        }
-        if (configuredUrl == null || configuredUrl.isBlank()) {
-            configuredUrl = DEFAULT_BASE_URL;
-        }
-        this.baseUrl = configuredUrl.replaceAll("/+$", "");
+        this.gson = new Gson();
+        this.baseUrl = BASE_URL;
     }
 
     public static ApiSingleton getInstance() {
         return INSTANCE;
     }
 
+    // Metodos de requisicao HTTP
     public <T> T get(String path, String token, Type responseType) {
         return this.request("GET", path, token, null, responseType);
     }
@@ -83,17 +82,21 @@ public final class ApiSingleton {
         }
 
         try {
+            //mandando a requisicao e recebendo a resposta
             HttpResponse<String> response = this.client.send(
                     request.build(),
                     HttpResponse.BodyHandlers.ofString());
 
             String responseBody = response.body();
+
+            //erro na resposta da API
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 String message =
                         this.errorMessage(responseBody, response.statusCode());
                 throw new ApiException(response.statusCode(), message);
             }
 
+            // resposta vazia
             if (responseType == Void.class || responseBody == null
                     || responseBody.isBlank()) {
                 return null;
